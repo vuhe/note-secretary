@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 "use client";
 
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
