@@ -1,18 +1,14 @@
+// noinspection JSUnusedGlobalSymbols
+
 "use client";
+
+import { CheckIcon, CopyIcon } from "lucide-react";
+import type { ComponentProps, HTMLAttributes } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { type BundledLanguage, codeToHtml, type ShikiTransformer } from "shiki";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { CheckIcon, CopyIcon } from "lucide-react";
-import {
-  type ComponentProps,
-  createContext,
-  type HTMLAttributes,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { type BundledLanguage, codeToHtml, type ShikiTransformer } from "shiki";
 
 type CodeBlockProps = HTMLAttributes<HTMLDivElement> & {
   code: string;
@@ -20,9 +16,9 @@ type CodeBlockProps = HTMLAttributes<HTMLDivElement> & {
   showLineNumbers?: boolean;
 };
 
-type CodeBlockContextType = {
+interface CodeBlockContextType {
   code: string;
-};
+}
 
 const CodeBlockContext = createContext<CodeBlockContextType>({
   code: "",
@@ -49,14 +45,8 @@ const lineNumberTransformer: ShikiTransformer = {
   },
 };
 
-export async function highlightCode(
-  code: string,
-  language: BundledLanguage,
-  showLineNumbers = false
-) {
-  const transformers: ShikiTransformer[] = showLineNumbers
-    ? [lineNumberTransformer]
-    : [];
+async function highlightCode(code: string, language: BundledLanguage, showLineNumbers = false) {
+  const transformers: ShikiTransformer[] = showLineNumbers ? [lineNumberTransformer] : [];
 
   return await Promise.all([
     codeToHtml(code, {
@@ -85,7 +75,7 @@ export const CodeBlock = ({
   const mounted = useRef(false);
 
   useEffect(() => {
-    highlightCode(code, language, showLineNumbers).then(([light, dark]) => {
+    void highlightCode(code, language, showLineNumbers).then(([light, dark]) => {
       if (!mounted.current) {
         setHtml(light);
         setDarkHtml(dark);
@@ -103,7 +93,7 @@ export const CodeBlock = ({
       <div
         className={cn(
           "group relative w-full overflow-hidden rounded-md border bg-background text-foreground",
-          className
+          className,
         )}
         {...props}
       >
@@ -119,9 +109,7 @@ export const CodeBlock = ({
             dangerouslySetInnerHTML={{ __html: darkHtml }}
           />
           {children && (
-            <div className="absolute top-2 right-2 flex items-center gap-2">
-              {children}
-            </div>
+            <div className="absolute top-2 right-2 flex items-center gap-2">{children}</div>
           )}
         </div>
       </div>
@@ -156,7 +144,9 @@ export const CodeBlockCopyButton = ({
       await navigator.clipboard.writeText(code);
       setIsCopied(true);
       onCopy?.();
-      setTimeout(() => setIsCopied(false), timeout);
+      setTimeout(() => {
+        setIsCopied(false);
+      }, timeout);
     } catch (error) {
       onError?.(error as Error);
     }
@@ -167,7 +157,9 @@ export const CodeBlockCopyButton = ({
   return (
     <Button
       className={cn("shrink-0", className)}
-      onClick={copyToClipboard}
+      onClick={() => {
+        void copyToClipboard();
+      }}
       size="icon"
       variant="ghost"
       {...props}

@@ -1,5 +1,8 @@
 "use client";
+
 import { Geist, Geist_Mono } from "next/font/google";
+import type { ReactNode } from "react";
+
 import "@/styles/globals.css";
 
 const geistSans = Geist({
@@ -15,15 +18,11 @@ const geistMono = Geist_Mono({
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
     </html>
   );
 }
