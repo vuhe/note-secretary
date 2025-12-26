@@ -21,6 +21,7 @@ const jetbrainsMono = localFont({
   ],
   variable: "--font-jetbrains-mono",
   display: "swap",
+  fallback: ["ui-monospace", "SF Mono", "Monaco", "Menlo", "Consolas", "PingFang SC", "monospace"],
 });
 
 export default function RootLayout({

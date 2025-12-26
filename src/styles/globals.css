@@ -10,9 +10,7 @@
   --font-sans:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue",
     "Microsoft YaHei", sans-serif;
-  --font-mono:
-    var(--font-jetbrains-mono), ui-monospace, "SF Mono", Monaco, Menlo, Consolas, "PingFang SC",
-    monospace;
+  --font-mono: var(--font-jetbrains-mono);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
