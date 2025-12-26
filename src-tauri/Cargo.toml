@@ -3,14 +3,14 @@ name = "note_secretary"
 version = "0.1.0"
 description = "AI-driven secretary for markdown notes"
 authors = ["vuhe"]
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-# The `_lib` suffix may seem redundant but it is necessary
-# to make the lib name unique and wouldn't conflict with the bin name.
-# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+# 为了确保库（lib）名称的唯一性 `_lib` 是必要后缀
+# 可以避免与二进制程序（bin）名称冲突
+# 此问题似乎仅出现在 Windows 平台上，详见：https://github.com/rust-lang/cargo/issues/8519
 name = "note_secretary_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
@@ -29,9 +29,10 @@ objc2-app-kit = "0.3.2"
 block2 = "0.6.1"
 
 [features]
-# by default Tauri runs in production mode
-# when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
+# Tauri 默认以生产模式（production mode）运行；
+# 当执行 `tauri dev` 时，如果 `devPath` 是一个 URL
+# 则会通过 `cargo run --no-default-features` 命令来启动
 default = ["custom-protocol"]
-# this feature is used used for production builds where `devPath` points to the filesystem
-# DO NOT remove this
+# 此 feature 主要用于生产构建（production builds），即 `devPath` 指向本地文件系统的情况
+# 请勿删除此行（DO NOT remove this）
 custom-protocol = ["tauri/custom-protocol"]
