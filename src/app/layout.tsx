@@ -1,19 +1,26 @@
 "use client";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { ThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
 
 import "@/styles/globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const jetbrainsMono = localFont({
+  src: [
+    {
+      path: "./fonts/JetBrainsMono[wght].woff2",
+      weight: "100 800",
+      style: "normal",
+    },
+    {
+      path: "./fonts/JetBrainsMono-Italic[wght].woff2",
+      weight: "100 800",
+      style: "italic",
+    },
+  ],
+  variable: "--font-jetbrains-mono",
+  display: "swap",
 });
 
 export default function RootLayout({
@@ -23,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-hidden`}>
+      <body className={`${jetbrainsMono.variable} antialiased overflow-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
         </ThemeProvider>

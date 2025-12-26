@@ -5,12 +5,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/*noinspection CssUnresolvedCustomProperty*/
 @theme inline {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue",
+    "Microsoft YaHei", sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono), ui-monospace, "SF Mono", Monaco, Menlo, Consolas, "PingFang SC",
+    monospace;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -126,5 +129,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    /*noinspection CssNoGenericFontName*/
+    font-family: var(--font-sans);
   }
 }
