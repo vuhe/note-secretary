@@ -1,5 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
-
 "use client";
 
 import { BookIcon, ChevronDownIcon } from "lucide-react";

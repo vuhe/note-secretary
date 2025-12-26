@@ -1,6 +1,7 @@
 "use client";
 
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
 
 import "@/styles/globals.css";
@@ -21,8 +22,12 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+    <html lang="zh" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-hidden`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

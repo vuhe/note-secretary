@@ -1,5 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
-
 "use client";
 
 import { ChevronDownIcon, SearchIcon } from "lucide-react";

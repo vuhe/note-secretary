@@ -159,7 +159,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1.5!">
               <a href="#">
                 <IconInnerShadowTop className="size-5!" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <span className="text-base font-semibold">笔记</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -158,7 +158,7 @@ export type MessageBranchContentProps = HTMLAttributes<HTMLDivElement>;
 
 export const MessageBranchContent = ({ children, ...props }: MessageBranchContentProps) => {
   const { currentBranch, setBranches, branches } = useMessageBranch();
-  const childrenArray = Array.isArray(children) ? children : [children];
+  const childrenArray = (Array.isArray(children) ? children : [children]) as ReactElement[];
 
   // Use useEffect to update branches when they change
   useEffect(() => {
@@ -263,6 +263,7 @@ export const MessageBranchPage = ({ className, ...props }: MessageBranchPageProp
 
 export type MessageResponseProps = ComponentProps<typeof Streamdown>;
 
+// biome-ignore lint/style/useComponentExportOnlyModules: React.memo Component
 export const MessageResponse = memo(
   ({ className, ...props }: MessageResponseProps) => (
     <Streamdown

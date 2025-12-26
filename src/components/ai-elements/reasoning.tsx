@@ -31,7 +31,6 @@ export type ReasoningProps = ComponentProps<typeof Collapsible> & {
   isStreaming?: boolean;
   open?: boolean;
   defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
   duration?: number;
 };
 
@@ -44,7 +43,6 @@ export const Reasoning = memo(
     isStreaming = false,
     open,
     defaultOpen = true,
-    onOpenChange,
     duration: durationProp,
     children,
     ...props
@@ -52,7 +50,6 @@ export const Reasoning = memo(
     const [isOpen, setIsOpen] = useControllableState({
       prop: open,
       defaultProp: defaultOpen,
-      onChange: onOpenChange,
     });
     const [duration, setDuration] = useControllableState({
       prop: durationProp,

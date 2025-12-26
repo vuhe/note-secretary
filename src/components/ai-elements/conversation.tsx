@@ -1,5 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
-
 "use client";
 
 import { ArrowDownIcon } from "lucide-react";

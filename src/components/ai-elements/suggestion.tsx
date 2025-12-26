@@ -1,5 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
-
 "use client";
 
 import type { ComponentProps } from "react";

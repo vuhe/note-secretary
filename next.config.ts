@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   distDir: "dist",
+  redirects: async () => {
+    return [
+      {
+        source: "/",
+        destination: "/chat",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
