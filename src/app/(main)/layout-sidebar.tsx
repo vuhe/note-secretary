@@ -19,10 +19,10 @@ import {
 } from "@tabler/icons-react";
 import type { ComponentProps } from "react";
 
-import { NavDocuments } from "@/components/nav-documents";
-import { NavMain } from "@/components/nav-main";
-import { NavSecondary } from "@/components/nav-secondary";
-import { NavUser } from "@/components/nav-user";
+import { NavDocuments } from "@/app/(main)/nav-documents";
+import { NavMain } from "@/app/(main)/nav-main";
+import { NavSecondary } from "@/app/(main)/nav-secondary";
+import { NavUser } from "@/app/(main)/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -157,10 +157,10 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1.5!">
-              <a href="#">
+              <span>
                 <IconInnerShadowTop className="size-5!" />
                 <span className="text-base font-semibold">笔记</span>
-              </a>
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
