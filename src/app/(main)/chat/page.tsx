@@ -33,7 +33,7 @@ export default function Page() {
   }, [requireLoading, setMessages]);
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <Conversation className="h-full">
         <ConversationContent>
           {loading ? (
@@ -63,6 +63,6 @@ export default function Page() {
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>
-    </div>
+    </>
   );
 }

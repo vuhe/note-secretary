@@ -1,10 +1,85 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import { FilePlusCornerIcon, MessageSquarePlusIcon, SettingsIcon } from "lucide-react";
+import type { ComponentProps, CSSProperties, ReactNode } from "react";
 
-import { AppSidebar } from "@/app/(main)/layout-sidebar";
-import { SiteHeader } from "@/app/(main)/site-header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { NavChatGroup, NavNoteGroup } from "@/app/(main)/nav-scope";
+import { NavSearch } from "@/app/(main)/nav-search";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from "@/components/ui/sidebar";
+
+const data = {
+  chats: [
+    {
+      title: "最近对话",
+      items: [{ title: "对话 1" }, { title: "对话 2" }],
+    },
+    {
+      title: "归档对话",
+      items: [{ title: "对话 3" }, { title: "对话 4" }],
+    },
+  ],
+  notes: [
+    {
+      title: "笔记分类 1",
+      items: [{ title: "笔记 1" }, { title: "笔记 2" }],
+    },
+    {
+      title: "笔记分类 2",
+      items: [{ title: "笔记 3" }, { title: "笔记 4" }],
+    },
+  ],
+};
+
+function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
+  return (
+    <Sidebar collapsible="offcanvas" {...props}>
+      <SidebarHeader>
+        <NavSearch />
+      </SidebarHeader>
+      <SidebarContent>
+        <NavChatGroup group={data.chats} />
+        <NavNoteGroup group={data.notes} />
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <span>
+                <MessageSquarePlusIcon />
+                <span>新建对话</span>
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <span>
+                <FilePlusCornerIcon />
+                <span>新建笔记</span>
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <span>
+                <SettingsIcon />
+                <span>设置</span>
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
 
 export default function Layout({
   children,
@@ -21,10 +96,7 @@ export default function Layout({
       }
     >
       <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="@container/main flex flex-1 flex-col h-full">{children}</div>
-      </SidebarInset>
+      {children}
     </SidebarProvider>
   );
 }
