@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ChatHeader } from "@/app/(main)/chat/chat-header";
+import ChatHeader from "@/app/(main)/chat/chat-header";
 import { SidebarInset } from "@/components/ui/sidebar";
 
 export default function Layout({
