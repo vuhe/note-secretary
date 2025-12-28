@@ -167,7 +167,7 @@ export default function ChatUsage({ usage }: { usage?: LanguageModelUsage }) {
   return (
     <Popover>
       <UsageTrigger usage={usage} />
-      <PopoverContent className="w-50 divide-y overflow-hidden p-0">
+      <PopoverContent className="w-50 divide-y overflow-hidden p-0 select-none">
         <UsageContentHeader usage={usage} />
         <UsageInput usage={usage} />
         <UsageOutput usage={usage} />
