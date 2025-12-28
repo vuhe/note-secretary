@@ -4,6 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import { MessageSquareIcon } from "lucide-react";
 import { useEffect } from "react";
 
+import ChatInput from "@/app/(main)/chat/chat-input";
 import ChatMessage from "@/app/(main)/chat/chat-message";
 import {
   Conversation,
@@ -63,6 +64,7 @@ export default function Page() {
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>
+      <ChatInput status={status} sendMessage={sendMessage} />
     </>
   );
 }

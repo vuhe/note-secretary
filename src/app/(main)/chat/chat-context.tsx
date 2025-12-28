@@ -35,7 +35,7 @@ const sampleFiles = {
 export default function ChatContext() {
   return (
     <PromptInputPopover>
-      <PromptInputPopoverTrigger>
+      <PromptInputPopoverTrigger asChild>
         <PromptInputButton className="h-8!" size="sm" variant="outline">
           <span className="text-base font-medium">Documents</span>
         </PromptInputButton>
