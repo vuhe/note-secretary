@@ -109,7 +109,6 @@ function AgentMessage({ message, status, last, regenerate }: AgentMessageProps) 
             const mediaType = part.mediaType.startsWith("image/") && part.url ? "image" : "file";
             if (mediaType === "image") {
               return (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   alt={part.filename}
                   className="h-auto max-w-full overflow-hidden rounded-md"

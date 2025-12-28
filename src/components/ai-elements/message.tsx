@@ -10,7 +10,7 @@ import { Streamdown } from "streamdown";
 
 import { Button } from "@/components/ui/button";
 import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
@@ -65,27 +65,12 @@ export const MessageAction = ({
   size = "icon-sm",
   ...props
 }: MessageActionProps) => {
-  const button = (
+  return (
     <Button size={size} type="button" variant={variant} {...props}>
       {children}
       <span className="sr-only">{label ?? tooltip}</span>
     </Button>
   );
-
-  if (tooltip) {
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>{button}</TooltipTrigger>
-          <TooltipContent>
-            <p>{tooltip}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
-
-  return button;
 };
 
 interface MessageBranchContextType {
@@ -317,16 +302,16 @@ export function MessageAttachment({ data, className, onRemove, ...props }: Messa
         </>
       ) : (
         <>
-          <Tooltip>
-            <TooltipTrigger asChild>
+          <Popover>
+            <PopoverTrigger asChild>
               <div className="flex size-full shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                 <PaperclipIcon className="size-4" />
               </div>
-            </TooltipTrigger>
-            <TooltipContent>
+            </PopoverTrigger>
+            <PopoverContent>
               <p>{attachmentLabel}</p>
-            </TooltipContent>
-          </Tooltip>
+            </PopoverContent>
+          </Popover>
           {onRemove && (
             <Button
               aria-label="Remove attachment"

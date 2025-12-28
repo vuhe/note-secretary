@@ -62,6 +62,7 @@ const eslintConfig = defineConfig([
       // eslint-plugin-react-hooks rules replaced by Biome
       "react-hooks/exhaustive-deps": "off",
       "react-hooks/rules-of-hooks": "off",
+      "@next/next/no-img-element": "off",
       // typescript-eslint rules replaced by Biome
       "@typescript-eslint/adjacent-overload-signatures": "off",
       "@typescript-eslint/array-type": "off",

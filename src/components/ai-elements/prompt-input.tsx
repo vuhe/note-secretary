@@ -55,13 +55,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -204,7 +204,7 @@ export function PromptInputProvider({
   }, []);
 
   const openFileDialog = useCallback(() => {
-    openRef.current?.();
+    openRef.current();
   }, []);
 
   const attachments = useMemo<AttachmentsContext>(
@@ -284,8 +284,8 @@ export function PromptInputAttachment({ data, className, ...props }: PromptInput
   const attachmentLabel = filename || (isImage ? "Image" : "Attachment");
 
   return (
-    <PromptInputHoverCard>
-      <HoverCardTrigger asChild>
+    <PromptInputPopover>
+      <PopoverTrigger asChild>
         <div
           className={cn(
             "group relative flex h-8 cursor-pointer select-none items-center gap-1.5 rounded-md border border-border px-1.5 font-medium text-sm transition-all hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
@@ -327,8 +327,8 @@ export function PromptInputAttachment({ data, className, ...props }: PromptInput
 
           <span className="flex-1 truncate">{attachmentLabel}</span>
         </div>
-      </HoverCardTrigger>
-      <PromptInputHoverCardContent className="w-auto p-2">
+      </PopoverTrigger>
+      <PromptInputPopoverContent className="w-auto p-2">
         <div className="w-auto space-y-3">
           {isImage && (
             <div className="flex max-h-96 w-96 items-center justify-center overflow-hidden rounded-md border">
@@ -352,8 +352,8 @@ export function PromptInputAttachment({ data, className, ...props }: PromptInput
             </div>
           </div>
         </div>
-      </PromptInputHoverCardContent>
-    </PromptInputHoverCard>
+      </PromptInputPopoverContent>
+    </PromptInputPopover>
   );
 }
 
@@ -576,6 +576,7 @@ export const PromptInput = ({
     if (!form) return;
     if (globalDrop) return; // when a global drop is on, let the document-level handler own drops
 
+    // noinspection DuplicatedCode
     const onDragOver = (e: DragEvent) => {
       if (e.dataTransfer?.types.includes("Files")) {
         e.preventDefault();
@@ -600,6 +601,7 @@ export const PromptInput = ({
   useEffect(() => {
     if (!globalDrop) return;
 
+    // noinspection DuplicatedCode
     const onDragOver = (e: DragEvent) => {
       if (e.dataTransfer?.types.includes("Files")) {
         e.preventDefault();
@@ -1172,28 +1174,22 @@ export const PromptInputSelectValue = ({ className, ...props }: PromptInputSelec
   <SelectValue className={cn(className)} {...props} />
 );
 
-export type PromptInputHoverCardProps = ComponentProps<typeof HoverCard>;
+export type PromptInputPopoverProps = ComponentProps<typeof Popover>;
 
-export const PromptInputHoverCard = ({
-  openDelay = 0,
-  closeDelay = 0,
-  ...props
-}: PromptInputHoverCardProps) => (
-  <HoverCard closeDelay={closeDelay} openDelay={openDelay} {...props} />
+export const PromptInputPopover = (props: PromptInputPopoverProps) => <Popover {...props} />;
+
+export type PromptInputPopoverTriggerProps = ComponentProps<typeof PopoverTrigger>;
+
+export const PromptInputPopoverTrigger = (props: PromptInputPopoverTriggerProps) => (
+  <PopoverTrigger {...props} />
 );
 
-export type PromptInputHoverCardTriggerProps = ComponentProps<typeof HoverCardTrigger>;
+export type PromptInputPopoverContentProps = ComponentProps<typeof PopoverContent>;
 
-export const PromptInputHoverCardTrigger = (props: PromptInputHoverCardTriggerProps) => (
-  <HoverCardTrigger {...props} />
-);
-
-export type PromptInputHoverCardContentProps = ComponentProps<typeof HoverCardContent>;
-
-export const PromptInputHoverCardContent = ({
+export const PromptInputPopoverContent = ({
   align = "start",
   ...props
-}: PromptInputHoverCardContentProps) => <HoverCardContent align={align} {...props} />;
+}: PromptInputPopoverContentProps) => <PopoverContent align={align} {...props} />;
 
 export type PromptInputTabsListProps = HTMLAttributes<HTMLDivElement>;
 
