@@ -646,6 +646,7 @@ export const PromptInput = ({
     try {
       const response = await fetch(url);
       const blob = await response.blob();
+      // eslint-disable-next-line @typescript-eslint/return-await
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -812,10 +813,6 @@ export const PromptInputTextarea = ({
 
   const handlePaste: ClipboardEventHandler<HTMLTextAreaElement> = (event) => {
     const items = event.clipboardData.items;
-
-    if (!items) {
-      return;
-    }
 
     const files: File[] = [];
 

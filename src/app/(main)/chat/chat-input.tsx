@@ -1,6 +1,6 @@
 import type { ChatStatus, FileUIPart } from "ai";
-import { GlobeIcon } from "lucide-react";
-import { useCallback, useRef } from "react";
+import { GlobeIcon, PlusIcon } from "lucide-react";
+import { useCallback, useState } from "react";
 
 import ChatPersona from "@/app/(main)/chat/chat-persona";
 import {
@@ -36,7 +36,7 @@ interface ChatInputProps {
 }
 
 export default function ChatInput({ status, sendMessage }: ChatInputProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
   const handleSubmit = useCallback(
     (message: PromptInputMessage) => {
       const hasText = Boolean(message.text);
@@ -60,21 +60,29 @@ export default function ChatInput({ status, sendMessage }: ChatInputProps) {
             {(attachment) => <PromptInputAttachment data={attachment} />}
           </PromptInputAttachments>
           <PromptInputBody>
-            <PromptInputTextarea ref={textareaRef} />
+            <PromptInputTextarea />
           </PromptInputBody>
           <PromptInputFooter>
             <PromptInputTools>
+              <ChatPersona />
+              <PromptInputButton
+                onClick={() => {
+                  setUseWebSearch(!useWebSearch);
+                }}
+                variant={useWebSearch ? "default" : "ghost"}
+              >
+                <GlobeIcon size={16} />
+                <span className="hidden sm:flex">网络搜索</span>
+              </PromptInputButton>
               <PromptInputActionMenu>
-                <PromptInputActionMenuTrigger />
+                <PromptInputActionMenuTrigger>
+                  <PlusIcon size={16} />
+                  <span className="hidden sm:flex">添加附件</span>
+                </PromptInputActionMenuTrigger>
                 <PromptInputActionMenuContent>
                   <PromptInputActionAddAttachments />
                 </PromptInputActionMenuContent>
               </PromptInputActionMenu>
-              <PromptInputButton>
-                <GlobeIcon size={16} />
-                <span>Search</span>
-              </PromptInputButton>
-              <ChatPersona />
             </PromptInputTools>
             <PromptInputSubmit status={status} />
           </PromptInputFooter>
