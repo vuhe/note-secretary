@@ -1,4 +1,5 @@
-use anyhow::anyhow;
+mod error;
+
 use std::path::PathBuf;
 use std::sync::OnceLock;
 use tauri::{App, Result, WebviewWindow};
@@ -65,7 +66,7 @@ fn set_work_dir(app: &App) -> Result<()> {
   std::fs::create_dir_all(&work_dir)?;
   APP_DATA_PATH
     .set(work_dir)
-    .map_err(|_| anyhow!("failed to set app data path"))?;
+    .map_err(|_| error::SetAppDataPathError)?;
 
   Ok(())
 }
