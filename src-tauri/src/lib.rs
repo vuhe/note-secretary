@@ -1,8 +1,7 @@
+mod database;
 mod error;
 
-use std::path::PathBuf;
-use std::sync::OnceLock;
-use tauri::{App, Result, WebviewWindow};
+use tauri::Result;
 
 #[tauri::command]
 fn greet() -> String {
@@ -13,10 +12,8 @@ fn greet() -> String {
   format!("Hello world from Rust! Current epoch: {epoch_ms}")
 }
 
-static APP_DATA_PATH: OnceLock<PathBuf> = OnceLock::new();
-
 #[cfg(target_os = "macos")]
-fn set_macos_title_bar(window: &WebviewWindow) -> Result<()> {
+fn set_macos_title_bar(window: &tauri::WebviewWindow) -> Result<()> {
   use block2::RcBlock;
   use objc2::rc::Retained;
   use objc2_app_kit::{NSAppearance, NSAppearanceNameDarkAqua, NSColor, NSWindow};
@@ -48,7 +45,7 @@ fn set_macos_title_bar(window: &WebviewWindow) -> Result<()> {
 }
 
 #[allow(unused_variables)]
-fn set_work_dir(app: &App) -> Result<()> {
+fn get_work_dir(app: &tauri::App) -> Result<std::path::PathBuf> {
   let work_dir = {
     #[cfg(debug_assertions)]
     {
@@ -64,11 +61,7 @@ fn set_work_dir(app: &App) -> Result<()> {
   };
 
   std::fs::create_dir_all(&work_dir)?;
-  APP_DATA_PATH
-    .set(work_dir)
-    .map_err(|_| error::SetAppDataPathError)?;
-
-  Ok(())
+  Ok(work_dir)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -91,8 +84,9 @@ pub fn run() {
         set_macos_title_bar(&window)?;
       }
 
-      // 设置全局数据目录
-      set_work_dir(&app)?;
+      // 设置数据库和向量引擎
+      let work_dir = get_work_dir(&app)?;
+      database::setup_database(&work_dir)?;
 
       Ok(())
     })

@@ -1,18 +1,17 @@
 use serde::ser::Serializer;
 
-#[derive(Debug)]
-pub struct SetAppDataPathError;
-
-impl std::fmt::Display for SetAppDataPathError {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    write!(f, "failed to set app data path")
-  }
+#[derive(Debug, thiserror::Error)]
+pub enum SetupError {
+  /// OnceLock set error.
+  #[error("failed to set {0}")]
+  OnceLock(&'static str),
+  /// Database error.
+  #[error("database: {0}")]
+  Database(#[from] sea_orm::DbErr),
 }
 
-impl std::error::Error for SetAppDataPathError {}
-
-impl From<SetAppDataPathError> for tauri::Error {
-  fn from(value: SetAppDataPathError) -> Self {
+impl From<SetupError> for tauri::Error {
+  fn from(value: SetupError) -> Self {
     Self::Anyhow(value.into())
   }
 }
@@ -23,6 +22,9 @@ pub enum Error {
   /// IO error.
   #[error("{0}")]
   IO(#[from] std::io::Error),
+  /// Database error.
+  #[error("database: {0}")]
+  Database(#[from] sea_orm::DbErr),
 }
 
 impl serde::Serialize for Error {
