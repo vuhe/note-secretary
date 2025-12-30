@@ -56,7 +56,7 @@ fn get_work_dir(app: &tauri::App) -> Result<std::path::PathBuf> {
     #[cfg(not(debug_assertions))]
     {
       use tauri::Manager;
-      app.path().app_local_data_dir()
+      app.path().app_local_data_dir()?
     }
   };
 

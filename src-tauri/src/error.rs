@@ -1,4 +1,5 @@
 use serde::ser::Serializer;
+use std::sync::OnceLock;
 
 #[derive(Debug, thiserror::Error)]
 pub enum SetupError {
@@ -16,8 +17,17 @@ impl From<SetupError> for tauri::Error {
   }
 }
 
+pub trait OnceLockSetup<T> {
+  fn setup(&self, value: T, hint: &'static str) -> std::result::Result<(), SetupError>;
+}
+
+impl<T> OnceLockSetup<T> for OnceLock<T> {
+  fn setup(&self, value: T, hint: &'static str) -> std::result::Result<(), SetupError> {
+    self.set(value).map_err(|_| SetupError::OnceLock(hint))
+  }
+}
+
 #[derive(Debug, thiserror::Error)]
-#[non_exhaustive]
 pub enum Error {
   /// IO error.
   #[error("{0}")]

@@ -1,3 +1,4 @@
+mod note_entity;
 mod setup;
 
 pub use setup::setup_database;
