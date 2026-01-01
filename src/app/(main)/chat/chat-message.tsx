@@ -46,7 +46,7 @@ function AgentMessage({ message, status, last, regenerate }: AgentMessageProps) 
   };
 
   return (
-    <>
+    <div>
       {sources.length > 0 && (
         <Sources>
           <SourcesTrigger count={sources.length} />
@@ -131,7 +131,7 @@ function AgentMessage({ message, status, last, regenerate }: AgentMessageProps) 
             return null;
         }
       })}
-    </>
+    </div>
   );
 }
 

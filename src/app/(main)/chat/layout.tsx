@@ -53,7 +53,7 @@ export default function Layout({
           </div>
         </div>
       </header>
-      <div className="@container/main flex flex-1 flex-col h-full">{children}</div>
+      <div className="@container/main flex flex-1 flex-col min-h-0">{children}</div>
     </SidebarInset>
   );
 }
