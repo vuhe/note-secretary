@@ -5,8 +5,13 @@ import type { LanguageModelUsage } from "ai";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
-import { usePersona } from "@/hooks/use-persona";
+import type { Persona } from "@/hooks/use-persona";
 import { cn } from "@/lib/utils";
+
+interface ChatUsageProps {
+  persona: Persona;
+  usage?: LanguageModelUsage;
+}
 
 const usageFormat = (value?: number) => {
   if (value === undefined) return "—";
@@ -21,8 +26,8 @@ const ICON_VIEW_BOX = 24;
 const ICON_CENTER = 12;
 const ICON_STROKE_WIDTH = 2;
 
-const UsageIcon = ({ usage }: { usage?: LanguageModelUsage }) => {
-  const maxTokens = usePersona((state) => state.maxTokens);
+const UsageIcon = ({ persona, usage }: ChatUsageProps) => {
+  const maxTokens = persona.maxTokens;
   const circumference = 2 * Math.PI * ICON_RADIUS;
   const usedPercent = (usage?.totalTokens ?? 0) / maxTokens;
   const dashOffset = circumference * (1 - usedPercent);
@@ -62,8 +67,8 @@ const UsageIcon = ({ usage }: { usage?: LanguageModelUsage }) => {
   );
 };
 
-const UsageTrigger = ({ usage }: { usage?: LanguageModelUsage }) => {
-  const maxTokens = usePersona((state) => state.maxTokens);
+const UsageTrigger = ({ persona, usage }: ChatUsageProps) => {
+  const maxTokens = persona.maxTokens;
   const usedPercent = (usage?.totalTokens ?? 0) / maxTokens;
   const renderedPercent = new Intl.NumberFormat("en-US", {
     style: "percent",
@@ -74,14 +79,14 @@ const UsageTrigger = ({ usage }: { usage?: LanguageModelUsage }) => {
     <PopoverTrigger asChild>
       <Button type="button" variant="ghost">
         <span className="font-mono font-medium text-muted-foreground">{renderedPercent}</span>
-        <UsageIcon usage={usage} />
+        <UsageIcon persona={persona} usage={usage} />
       </Button>
     </PopoverTrigger>
   );
 };
 
-const UsageContentHeader = ({ usage }: { usage?: LanguageModelUsage }) => {
-  const maxTokens = usePersona((state) => state.maxTokens);
+const UsageContentHeader = ({ persona, usage }: ChatUsageProps) => {
+  const maxTokens = persona.maxTokens;
   const usedTokens = usage?.totalTokens ?? 0;
   const usedPercent = usedTokens / maxTokens;
   const displayPct = new Intl.NumberFormat("en-US", {
@@ -163,12 +168,12 @@ const UsageOutput = ({ usage }: { usage?: LanguageModelUsage }) => {
   );
 };
 
-export default function ChatUsage({ usage }: { usage?: LanguageModelUsage }) {
+export default function ChatUsage({ persona, usage }: ChatUsageProps) {
   return (
     <Popover>
-      <UsageTrigger usage={usage} />
+      <UsageTrigger persona={persona} usage={usage} />
       <PopoverContent className="w-50 divide-y overflow-hidden p-0 select-none">
-        <UsageContentHeader usage={usage} />
+        <UsageContentHeader persona={persona} usage={usage} />
         <UsageInput usage={usage} />
         <UsageOutput usage={usage} />
       </PopoverContent>

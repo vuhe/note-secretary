@@ -1,4 +1,4 @@
-import type { ChatStatus, FileUIPart } from "ai";
+import type { ChatRequestOptions, ChatStatus, FileUIPart } from "ai";
 import { GlobeIcon, PlusIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 
@@ -20,6 +20,7 @@ import {
   PromptInputTextarea,
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
+import { usePersona } from "@/hooks/use-persona";
 
 type SendMessageOptions =
   | {
@@ -32,24 +33,30 @@ type SendMessageOptions =
 
 interface ChatInputProps {
   status: ChatStatus;
-  sendMessage: (options: SendMessageOptions) => Promise<void>;
+  sendMessage: (msg: SendMessageOptions, options?: ChatRequestOptions) => Promise<void>;
 }
 
 export default function ChatInput({ status, sendMessage }: ChatInputProps) {
+  const persona = usePersona((state) => state.selected);
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
   const handleSubmit = useCallback(
     (message: PromptInputMessage) => {
+      if (!persona) return;
+      const options: ChatRequestOptions = {
+        metadata: persona,
+      };
+
       const hasText = Boolean(message.text);
       const hasAttachments = Boolean(message.files.length);
 
       if (hasText) {
         const files = hasAttachments ? message.files : undefined;
-        void sendMessage({ text: message.text, files });
+        void sendMessage({ text: message.text, files }, options);
       } else if (hasAttachments) {
-        void sendMessage({ files: message.files });
+        void sendMessage({ files: message.files }, options);
       }
     },
-    [sendMessage],
+    [sendMessage, persona],
   );
 
   return (
@@ -84,7 +91,7 @@ export default function ChatInput({ status, sendMessage }: ChatInputProps) {
                 </PromptInputActionMenuContent>
               </PromptInputActionMenu>
             </PromptInputTools>
-            <PromptInputSubmit status={status} />
+            <PromptInputSubmit status={status} disabled={persona === undefined} />
           </PromptInputFooter>
         </PromptInput>
       </PromptInputProvider>

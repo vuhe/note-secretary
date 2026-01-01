@@ -1,16 +1,9 @@
+mod command;
 mod database;
 mod error;
 
+use command::AppCommand;
 use tauri::Result;
-
-#[tauri::command]
-fn greet() -> String {
-  // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-  use std::time::{SystemTime, UNIX_EPOCH};
-  let now = SystemTime::now();
-  let epoch_ms = now.duration_since(UNIX_EPOCH).unwrap().as_millis();
-  format!("Hello world from Rust! Current epoch: {epoch_ms}")
-}
 
 #[cfg(target_os = "macos")]
 fn set_macos_title_bar(window: &tauri::WebviewWindow) -> Result<()> {
@@ -67,8 +60,9 @@ fn get_work_dir(app: &tauri::App) -> Result<std::path::PathBuf> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
+    .plugin(tauri_plugin_http::init())
     .plugin(tauri_plugin_opener::init())
-    .invoke_handler(tauri::generate_handler![greet])
+    .register_handler()
     .setup(|app| {
       let win_builder = tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::default())
         .title("Note Secretary")

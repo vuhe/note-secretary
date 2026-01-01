@@ -1,10 +1,12 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import ChatContext from "@/app/(main)/chat/chat-context";
 import ChatUsage from "@/app/(main)/chat/chat-usage";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { usePersona } from "@/hooks/use-persona";
 
 const usage = {
   inputTokens: 32_000,
@@ -28,6 +30,8 @@ export default function Layout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const persona = usePersona((state) => state.selected);
+
   return (
     <SidebarInset>
       <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
@@ -35,7 +39,7 @@ export default function Layout({
           <SidebarTrigger className="-ml-1 mr-2" />
           <ChatContext />
           <div className="ml-auto flex items-center gap-2">
-            <ChatUsage usage={usage} />
+            {persona && <ChatUsage persona={persona} usage={usage} />}
             <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
               <a
                 href="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
