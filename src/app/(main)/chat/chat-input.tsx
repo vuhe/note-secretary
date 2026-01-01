@@ -34,13 +34,25 @@ type SendMessageOptions =
 interface ChatInputProps {
   status: ChatStatus;
   sendMessage: (msg: SendMessageOptions, options?: ChatRequestOptions) => Promise<void>;
+  stop: () => Promise<void>;
 }
 
-export default function ChatInput({ status, sendMessage }: ChatInputProps) {
+export default function ChatInput({ status, sendMessage, stop }: ChatInputProps) {
   const persona = usePersona((state) => state.selected);
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
+
   const handleSubmit = useCallback(
     (message: PromptInputMessage) => {
+      if (status === "submitted" || status === "streaming") {
+        void stop();
+        return;
+      }
+
+      if (status === "error") {
+        // TODO: 错误清空处理
+        return;
+      }
+
       if (!persona) return;
       const options: ChatRequestOptions = {
         metadata: persona,
@@ -56,7 +68,7 @@ export default function ChatInput({ status, sendMessage }: ChatInputProps) {
         void sendMessage({ files: message.files }, options);
       }
     },
-    [sendMessage, persona],
+    [status, sendMessage, stop, persona],
   );
 
   return (

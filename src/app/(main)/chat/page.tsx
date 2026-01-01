@@ -21,7 +21,7 @@ export default function Page() {
   const requireLoading = useChatId((state) => state.requireLoading);
   const loading = useChatId((state) => state.loading);
 
-  const { messages, sendMessage, status, regenerate, setMessages } = useChat({
+  const { messages, sendMessage, status, regenerate, setMessages, stop } = useChat({
     id: id,
     transport: new Agent(),
   });
@@ -64,7 +64,7 @@ export default function Page() {
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>
-      <ChatInput status={status} sendMessage={sendMessage} />
+      <ChatInput status={status} sendMessage={sendMessage} stop={stop} />
     </>
   );
 }
