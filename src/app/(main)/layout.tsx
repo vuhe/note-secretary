@@ -1,7 +1,7 @@
 "use client";
 
 import { SettingsIcon } from "lucide-react";
-import type { ComponentProps, CSSProperties, ReactNode } from "react";
+import { type ComponentProps, type CSSProperties, type ReactNode, useEffect } from "react";
 
 import { NavChatGroup, NavNoteGroup } from "@/app/(main)/nav-scope";
 import { NavSearch } from "@/app/(main)/nav-search";
@@ -15,6 +15,8 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from "@/components/ui/sidebar";
+import { useEnvMobile } from "@/hooks/use-mobile";
+import { usePersona } from "@/hooks/use-persona";
 
 const data = {
   chats: [
@@ -70,6 +72,11 @@ export default function Layout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  useEffect(() => {
+    void useEnvMobile.getState().init();
+    void usePersona.getState().update();
+  }, []);
+
   return (
     <SidebarProvider
       style={

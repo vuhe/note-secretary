@@ -2,11 +2,11 @@
 
 import localFont from "next/font/local";
 import { ThemeProvider } from "next-themes";
-import { type ReactNode, useEffect } from "react";
+import type { ReactNode } from "react";
 
 import "@/styles/globals.css";
-import { usePersona } from "@/hooks/use-persona";
 
+// noinspection SpellCheckingInspection
 const jetbrainsMono = localFont({
   src: [
     {
@@ -30,10 +30,6 @@ export default function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  useEffect(() => {
-    void usePersona.getState().update();
-  }, []);
-
   return (
     <html lang="zh" suppressHydrationWarning>
       <body className={`${jetbrainsMono.variable} antialiased overflow-hidden`}>
