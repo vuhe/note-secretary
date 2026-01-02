@@ -2,7 +2,7 @@ import type { ChatRequestOptions, ChatStatus, FileUIPart } from "ai";
 import { GlobeIcon, PlusIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 
-import ChatPersona from "@/app/(main)/chat/chat-persona";
+import ChatPersona from "@/app/chat/chat-persona";
 import {
   PromptInput,
   PromptInputActionAddAttachments,
