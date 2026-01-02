@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatStatus, FileUIPart, UIMessage } from "ai";
-import { CopyIcon, DownloadIcon, RefreshCcwIcon } from "lucide-react";
+import { CopyIcon, DownloadIcon, GitBranchPlusIcon } from "lucide-react";
 import mime from "mime-types";
 
 import {
@@ -25,7 +25,6 @@ interface MessageProps {
 interface AgentMessageProps extends MessageProps {
   status: ChatStatus;
   last: boolean;
-  regenerate: () => Promise<void>;
 }
 
 function filename(file: FileUIPart) {
@@ -35,7 +34,8 @@ function filename(file: FileUIPart) {
   return "保存生成文件";
 }
 
-function AgentMessage({ message, status, last, regenerate }: AgentMessageProps) {
+function AgentMessage({ message, status, last }: AgentMessageProps) {
+  const showActions = !last || status === "error" || status === "ready";
   const sources = message.parts.filter(
     (part) => part.type === "source-url" || part.type === "source-document",
   );
@@ -82,16 +82,18 @@ function AgentMessage({ message, status, last, regenerate }: AgentMessageProps) 
                     {part.text}
                   </MessageResponse>
                 </MessageContent>
-                {last && (
+                {showActions && (
                   <MessageActions>
-                    <MessageAction onClick={() => void regenerate()} label="重新生成">
-                      <RefreshCcwIcon className="size-3" />
+                    <MessageAction onClick={() => {}} size="sm">
+                      <GitBranchPlusIcon className="size-3" />
+                      <span className="text-muted-foreground text-xs">派生分支</span>
                     </MessageAction>
                     <MessageAction
                       onClick={() => void navigator.clipboard.writeText(part.text)}
-                      label="复制内容"
+                      size="sm"
                     >
                       <CopyIcon className="size-3" />
+                      <span className="text-muted-foreground text-xs">复制内容</span>
                     </MessageAction>
                   </MessageActions>
                 )}

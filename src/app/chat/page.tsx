@@ -25,7 +25,7 @@ export default function Page() {
   const requireLoading = useChatId((state) => state.requireLoading);
   const loading = useChatId((state) => state.loading);
 
-  const { messages, sendMessage, status, regenerate, setMessages, stop } = useChat({
+  const { messages, sendMessage, status, setMessages, stop } = useChat({
     id: id,
     transport: new Agent(),
   });
@@ -79,7 +79,6 @@ export default function Page() {
                   key={message.id}
                   status={status}
                   last={i === messages.length - 1}
-                  regenerate={regenerate}
                   message={message}
                 />
               ))
