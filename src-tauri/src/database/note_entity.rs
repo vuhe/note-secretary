@@ -1,4 +1,6 @@
+use sea_orm::QuerySelect;
 use sea_orm::entity::prelude::*;
+use serde::Serialize;
 
 #[sea_orm::model]
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
@@ -20,3 +22,25 @@ pub struct Model {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+#[derive(DerivePartialModel, Serialize)]
+#[sea_orm(entity = "Entity")]
+pub struct NoteSummary {
+  pub id: String,
+  pub category: String,
+  pub title: String,
+}
+
+impl Model {
+  pub async fn all() -> crate::error::Result<Vec<NoteSummary>> {
+    let result = Entity::find()
+      .select_only()
+      .column(Column::Id)
+      .column(Column::Category)
+      .column(Column::Title)
+      .into_model::<NoteSummary>()
+      .all(super::DATABASE.get().unwrap())
+      .await?;
+    Ok(result)
+  }
+}

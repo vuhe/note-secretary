@@ -16,6 +16,7 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar";
 import { useEnvMobile } from "@/hooks/use-mobile";
+import { useNavMenu } from "@/hooks/use-nav";
 import { usePersona } from "@/hooks/use-persona";
 
 const data = {
@@ -29,16 +30,6 @@ const data = {
       items: [{ title: "对话 3" }, { title: "对话 4" }],
     },
   ],
-  notes: [
-    {
-      title: "笔记分类 1",
-      items: [{ title: "笔记 1" }, { title: "笔记 2" }],
-    },
-    {
-      title: "笔记分类 2",
-      items: [{ title: "笔记 3" }, { title: "笔记 4" }],
-    },
-  ],
 };
 
 function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
@@ -49,7 +40,7 @@ function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavChatGroup group={data.chats} />
-        <NavNoteGroup group={data.notes} />
+        <NavNoteGroup />
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
@@ -74,6 +65,7 @@ export default function Layout({
 }>) {
   useEffect(() => {
     void useEnvMobile.getState().init();
+    void useNavMenu.getState().update();
     void usePersona.getState().update();
   }, []);
 

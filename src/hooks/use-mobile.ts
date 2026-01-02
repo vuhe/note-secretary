@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
+import { useEffect, useState } from "react";
+import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, "getState" | "getInitialState" | "subscribe">;
 type ReadonlyStore<T> = UseBoundStore<ReadonlyStoreApi<T>>;

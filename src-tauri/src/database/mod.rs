@@ -1,6 +1,8 @@
 mod note_entity;
 mod persona_entity;
 
+pub use note_entity::Model as Note;
+pub use note_entity::NoteSummary;
 pub use persona_entity::Model as Persona;
 
 use crate::error::{OnceLockSetup, SetupError};

@@ -9,6 +9,7 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
 } from "@/components/ui/sidebar";
+import { useNavMenu } from "@/hooks/use-nav";
 
 interface NavScopeItem {
   title: string;
@@ -67,7 +68,8 @@ function NavChatGroup({ group }: { group: NavScope[] }) {
   );
 }
 
-function NavNoteGroup({ group }: { group: NavScope[] }) {
+function NavNoteGroup() {
+  const notes = useNavMenu((state) => state.notes);
   return (
     <SidebarGroup>
       <SidebarGroupLabel>笔记</SidebarGroupLabel>
@@ -81,7 +83,7 @@ function NavNoteGroup({ group }: { group: NavScope[] }) {
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          {group.map((item) => (
+          {notes.map((item) => (
             <SidebarMenuItem key={item.title}>
               <Collapsible className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90">
                 <CollapsibleTrigger asChild>
@@ -92,7 +94,7 @@ function NavNoteGroup({ group }: { group: NavScope[] }) {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items.map((subItem) => (
+                    {item.notes.map((subItem) => (
                       <SidebarMenuButton
                         key={subItem.title}
                         isActive={subItem.title === "button.tsx"}
