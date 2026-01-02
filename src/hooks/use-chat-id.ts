@@ -1,4 +1,4 @@
-import { createIdGenerator, type UIMessage } from "ai";
+import { createIdGenerator, type LanguageModelUsage, type UIMessage } from "ai";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, "getState" | "getInitialState" | "subscribe">;
@@ -15,9 +15,11 @@ interface ChatId {
   id: string;
   requireLoading: boolean;
   loading: boolean;
+  usage?: LanguageModelUsage;
 
   newChat: () => void;
   loadChat: (id: string) => void;
+  updateUsage: (usage: LanguageModelUsage) => void;
   loadMessages: (setter: MessagesSetter) => Promise<void>;
 }
 
@@ -27,11 +29,15 @@ export const useChatId: ReadonlyStore<ChatId> = create((set, get) => ({
   loading: false,
 
   newChat: () => {
-    set({ id: idGenerator(), requireLoading: false, loading: false });
+    set({ id: idGenerator(), requireLoading: false, loading: false, usage: undefined });
   },
 
   loadChat: (id) => {
-    set({ id, requireLoading: true, loading: false });
+    set({ id, requireLoading: true, loading: false, usage: undefined });
+  },
+
+  updateUsage: (usage) => {
+    set({ usage });
   },
 
   loadMessages: async (setter) => {

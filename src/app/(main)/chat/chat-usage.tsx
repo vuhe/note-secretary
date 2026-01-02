@@ -5,7 +5,8 @@ import type { LanguageModelUsage } from "ai";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
-import type { Persona } from "@/hooks/use-persona";
+import { useChatId } from "@/hooks/use-chat-id";
+import { type Persona, usePersona } from "@/hooks/use-persona";
 import { cn } from "@/lib/utils";
 
 interface ChatUsageProps {
@@ -168,7 +169,11 @@ const UsageOutput = ({ usage }: { usage?: LanguageModelUsage }) => {
   );
 };
 
-export default function ChatUsage({ persona, usage }: ChatUsageProps) {
+export default function ChatUsage() {
+  const persona = usePersona((state) => state.selected);
+  const usage = useChatId((state) => state.usage);
+  if (!persona) return null;
+
   return (
     <Popover>
       <UsageTrigger persona={persona} usage={usage} />

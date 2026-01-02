@@ -21,8 +21,7 @@ pub struct Model {
   #[serde(skip_serializing_if = "Option::is_none")]
   pub base_url: Option<String>,
   /// 参数 maxTokens
-  #[serde(skip_serializing_if = "Option::is_none")]
-  pub max_tokens: Option<i32>,
+  pub max_tokens: i32,
   /// 参数 maxOutputTokens
   #[serde(skip_serializing_if = "Option::is_none")]
   pub max_output_tokens: Option<i32>,

@@ -44,6 +44,7 @@ export class Persona {
   constructor(props: Record<string, unknown>) {
     this.id = props.id as string;
 
+    this.maxTokens = props.maxTokens as number;
     this.provider = props.provider as string;
     const modelId = props.model as string;
     const apiKey = props.apiKey as string;
@@ -60,16 +61,6 @@ export class Persona {
       }
       default:
         throw new Error(`暂不支持 ${this.provider} 提供商`);
-    }
-
-    if (
-      typeof props.maxTokens === "number" &&
-      props.maxTokens > 0 &&
-      Number.isFinite(props.maxTokens)
-    ) {
-      this.maxTokens = props.maxTokens;
-    } else {
-      this.maxTokens = 0;
     }
 
     if (typeof props.maxOutputTokens === "number") {

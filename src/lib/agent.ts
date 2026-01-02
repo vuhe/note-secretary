@@ -2,10 +2,12 @@ import {
   type ChatRequestOptions,
   type ChatTransport,
   convertToModelMessages,
+  createUIMessageStream,
   streamText,
   type UIMessage,
   type UIMessageChunk,
 } from "ai";
+import { useChatId } from "@/hooks/use-chat-id";
 import type { Persona } from "@/hooks/use-persona";
 
 type SendMessageOption = {
@@ -34,8 +36,31 @@ export class Agent implements ChatTransport<UIMessage> {
       system: model.systemPrompt,
       messages: await convertToModelMessages(options.messages),
       abortSignal: options.abortSignal,
+      onStepFinish: (it) => {
+        useChatId.getState().updateUsage(it.usage);
+      },
     });
-    return result.toUIMessageStream();
+    return createUIMessageStream({
+      async execute({ writer }) {
+        // TODO: 将 writer 传入 tool 用于在工具中发送状态
+        writer.merge(result.toUIMessageStream());
+      },
+      onError: (error) => {
+        if (error instanceof Error) return error.message;
+        if (typeof error === "string") return error;
+        if (error == null) return "";
+        try {
+          return JSON.stringify(error);
+        } catch {
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
+          return String(error);
+        }
+      },
+      originalMessages: options.messages,
+      onFinish: ({ messages }) => {
+        // TODO: 保存历史记录
+      },
+    });
   }
 
   reconnectToStream(_: ReconnectOption) {

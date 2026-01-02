@@ -1,6 +1,6 @@
 "use client";
 
-import { FilePlusCornerIcon, MessageSquarePlusIcon, SettingsIcon } from "lucide-react";
+import { SettingsIcon } from "lucide-react";
 import type { ComponentProps, CSSProperties, ReactNode } from "react";
 
 import { NavChatGroup, NavNoteGroup } from "@/app/(main)/nav-scope";
@@ -51,22 +51,6 @@ function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <span>
-                <MessageSquarePlusIcon />
-                <span>新建对话</span>
-              </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <span>
-                <FilePlusCornerIcon />
-                <span>新建笔记</span>
-              </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <span>

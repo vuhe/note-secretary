@@ -1,4 +1,4 @@
-import { ChevronRightIcon, FolderIcon } from "lucide-react";
+import { ChevronRightIcon, FilePlusCornerIcon, MessageSquarePlusIcon } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   SidebarGroup,
@@ -25,6 +25,14 @@ function NavChatGroup({ group }: { group: NavScope[] }) {
       <SidebarGroupLabel>聊天记录</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <span>
+                <MessageSquarePlusIcon />
+                <span>新建对话</span>
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           {group.map((item) => (
             <SidebarMenuItem key={item.title}>
               <Collapsible
@@ -34,7 +42,6 @@ function NavChatGroup({ group }: { group: NavScope[] }) {
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton>
                     <ChevronRightIcon className="transition-transform" />
-                    <FolderIcon />
                     {item.title}
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
@@ -66,13 +73,20 @@ function NavNoteGroup({ group }: { group: NavScope[] }) {
       <SidebarGroupLabel>笔记</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <span>
+                <FilePlusCornerIcon />
+                <span>新建笔记</span>
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           {group.map((item) => (
             <SidebarMenuItem key={item.title}>
               <Collapsible className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90">
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton>
                     <ChevronRightIcon className="transition-transform" />
-                    <FolderIcon />
                     {item.title}
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
