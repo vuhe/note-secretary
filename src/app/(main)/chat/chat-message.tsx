@@ -67,7 +67,20 @@ function AgentMessage({ message, status, last, regenerate }: AgentMessageProps) 
             return (
               <Message key={`${message.id}-${i}`} from={message.role}>
                 <MessageContent>
-                  <MessageResponse>{part.text}</MessageResponse>
+                  <MessageResponse
+                    controls={{
+                      table: true,
+                      code: true,
+                      mermaid: {
+                        download: true,
+                        copy: true,
+                        fullscreen: false,
+                        panZoom: true,
+                      },
+                    }}
+                  >
+                    {part.text}
+                  </MessageResponse>
                 </MessageContent>
                 {last && (
                   <MessageActions>

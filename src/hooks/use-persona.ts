@@ -7,6 +7,25 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, "getState" | "getInitialState" | "subscribe">;
 type ReadonlyStore<T> = UseBoundStore<ReadonlyStoreApi<T>>;
 
+const SystemPromptPrefix = `LaTeX 公式的渲染仅支持符合以下约定的：
+
+1. **行内公式**：请使用两个美元符号 **$$...$$** 包裹，且公式前后不换行。  
+   示例：这是质能方程 $$E = mc^{2}$$ 的应用。
+
+2. **单行公式**：请使用两个美元符号 **$$...$$** 包裹，并确保公式独立成行（前后换行）。  
+   示例：  
+   $$
+   E = mc^{2}
+   $$
+
+3. **流程图**：使用 Mermaid 代码块（\`\`\`mermaid ... \`\`\`）绘制。
+
+请在所有回答中严格遵守此格式，以确保公式正确显示。
+
+---
+
+`;
+
 export class Persona {
   readonly id: string;
   readonly provider: string;
@@ -89,7 +108,7 @@ export class Persona {
       }
     }
 
-    this.systemPrompt = props.systemPrompt as string;
+    this.systemPrompt = `${SystemPromptPrefix}\n${props.systemPrompt as string}`;
   }
 }
 
