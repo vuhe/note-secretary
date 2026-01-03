@@ -1,5 +1,7 @@
 "use client";
 
+import NoteContent from "@/app/note/note-content";
+import { NoteError, NoteLoading } from "@/app/note/note-loading";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { useNote } from "@/hooks/use-note";
@@ -29,7 +31,15 @@ export default function Page() {
           </div>
         </div>
       </header>
-      <div className="@container/main flex flex-1 flex-col min-h-0">{title}</div>
+      <div className="@container/main flex flex-1 flex-col min-h-0">
+        {status.status === "loading" ? (
+          <NoteLoading />
+        ) : status.status === "error" ? (
+          <NoteError error={status.value} />
+        ) : (
+          <NoteContent note={status.value} />
+        )}
+      </div>
     </SidebarInset>
   );
 }

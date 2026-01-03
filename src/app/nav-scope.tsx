@@ -36,12 +36,12 @@ function NavChatGroup({ group }: { group: NavScope[] }) {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>聊天记录</SidebarGroupLabel>
+      <SidebarGroupLabel className="select-none">聊天记录</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild onClick={newChat}>
-              <span>
+              <span className="select-none">
                 <MessageSquarePlusIcon />
                 <span>新建对话</span>
               </span>
@@ -89,12 +89,12 @@ function NavNoteGroup() {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>笔记</SidebarGroupLabel>
+      <SidebarGroupLabel className="select-none">笔记</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <span>
+              <span className="select-none">
                 <FilePlusCornerIcon />
                 <span>新建笔记</span>
               </span>
