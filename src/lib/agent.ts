@@ -9,6 +9,7 @@ import {
 } from "ai";
 import { useChatId } from "@/hooks/use-chat-id";
 import type { Persona } from "@/hooks/use-persona";
+import { safeErrorString } from "@/lib/utils";
 
 type SendMessageOption = {
   trigger: "submit-message" | "regenerate-message";
@@ -45,17 +46,7 @@ export class Agent implements ChatTransport<UIMessage> {
         // TODO: 将 writer 传入 tool 用于在工具中发送状态
         writer.merge(result.toUIMessageStream());
       },
-      onError: (error) => {
-        if (error instanceof Error) return error.message;
-        if (typeof error === "string") return error;
-        if (error == null) return "";
-        try {
-          return JSON.stringify(error);
-        } catch {
-          // eslint-disable-next-line @typescript-eslint/no-base-to-string
-          return String(error);
-        }
-      },
+      onError: safeErrorString,
       originalMessages: options.messages,
       onFinish: ({ messages }) => {
         // TODO: 保存历史记录

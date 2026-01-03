@@ -1,5 +1,8 @@
+import { useChat } from "@ai-sdk/react";
 import { createIdGenerator, type LanguageModelUsage, type UIMessage } from "ai";
+import { useEffect } from "react";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
+import { Agent } from "@/lib/agent";
 
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, "getState" | "getInitialState" | "subscribe">;
 type ReadonlyStore<T> = UseBoundStore<ReadonlyStoreApi<T>>;
@@ -61,3 +64,27 @@ export const useChatId: ReadonlyStore<ChatId> = create((set, get) => ({
     }
   },
 }));
+
+export function useChatContext() {
+  const id = useChatId((state) => state.id);
+  const requireLoading = useChatId((state) => state.requireLoading);
+
+  const { messages, sendMessage, status, setMessages, stop } = useChat({
+    id: id,
+    transport: new Agent(),
+  });
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: listen requireLoading change
+  useEffect(() => {
+    const state = useChatId.getState();
+    if (!state.requireLoading || state.loading) return;
+    void state.loadMessages(setMessages);
+  }, [requireLoading, setMessages]);
+
+  return {
+    messages,
+    sendMessage,
+    status,
+    stop,
+  };
+}

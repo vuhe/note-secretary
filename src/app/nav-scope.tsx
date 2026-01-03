@@ -2,6 +2,7 @@
 
 import { ChevronRightIcon, FilePlusCornerIcon, MessageSquarePlusIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
@@ -13,6 +14,7 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
 } from "@/components/ui/sidebar";
+import { useChatId } from "@/hooks/use-chat-id";
 import { useNavMenu } from "@/hooks/use-nav";
 
 interface NavScopeItem {
@@ -25,13 +27,20 @@ interface NavScope {
 }
 
 function NavChatGroup({ group }: { group: NavScope[] }) {
+  const router = useRouter();
+
+  const newChat = useCallback(() => {
+    useChatId.getState().newChat();
+    router.push("/chat");
+  }, [router]);
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>聊天记录</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild onClick={newChat}>
               <span>
                 <MessageSquarePlusIcon />
                 <span>新建对话</span>
@@ -56,7 +65,6 @@ function NavChatGroup({ group }: { group: NavScope[] }) {
                       <SidebarMenuButton
                         key={subItem.title}
                         isActive={subItem.title === "button.tsx"}
-                        className="data-[active=true]:bg-transparent"
                       >
                         {subItem.title}
                       </SidebarMenuButton>
@@ -107,7 +115,6 @@ function NavNoteGroup() {
                       <SidebarMenuButton
                         key={subItem.title}
                         isActive={currUrl === `/note?id=${subItem.id}`}
-                        className="data-[active=true]:bg-transparent"
                         onClick={() => {
                           router.push(`/note?id=${subItem.id}`);
                         }}

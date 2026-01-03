@@ -13,6 +13,7 @@ impl<R: Runtime> AppCommand for Builder<R> {
     self.invoke_handler(tauri::generate_handler![
       handle_env::env_is_mobile,
       handle_notes::get_all_notes,
+      handle_notes::get_note_by_id,
       handle_personas::get_all_personas,
       handle_personas::save_persona,
     ])

@@ -35,6 +35,9 @@ pub enum Error {
   /// Database error.
   #[error("database: {0}")]
   Database(#[from] sea_orm::DbErr),
+  /// NotFound error.
+  #[error("{0} not found")]
+  NotFound(String),
 }
 
 impl serde::Serialize for Error {

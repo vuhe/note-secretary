@@ -1,8 +1,6 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
 import { MessageSquareIcon } from "lucide-react";
-import { useEffect } from "react";
 
 import ChatContext from "@/app/chat/chat-context";
 import ChatInput from "@/app/chat/chat-input";
@@ -15,27 +13,12 @@ import {
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
 import { Loader } from "@/components/ai-elements/loader";
-import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { useChatId } from "@/hooks/use-chat-id";
-import { Agent } from "@/lib/agent";
+import { useChatContext, useChatId } from "@/hooks/use-chat-id";
 
 export default function Page() {
-  const id = useChatId((state) => state.id);
-  const requireLoading = useChatId((state) => state.requireLoading);
   const loading = useChatId((state) => state.loading);
-
-  const { messages, sendMessage, status, setMessages, stop } = useChat({
-    id: id,
-    transport: new Agent(),
-  });
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: listen requireLoading change
-  useEffect(() => {
-    const state = useChatId.getState();
-    if (!state.requireLoading || state.loading) return;
-    void state.loadMessages(setMessages);
-  }, [requireLoading, setMessages]);
+  const { messages, sendMessage, status, stop } = useChatContext();
 
   return (
     <SidebarInset>

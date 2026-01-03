@@ -3,7 +3,7 @@ use sea_orm::entity::prelude::*;
 use serde::Serialize;
 
 #[sea_orm::model]
-#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
+#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize)]
 #[sea_orm(table_name = "notes")]
 pub struct Model {
   /// id，唯一标识符，UUID
@@ -42,5 +42,13 @@ impl Model {
       .all(super::DATABASE.get().unwrap())
       .await?;
     Ok(result)
+  }
+
+  pub async fn find_by_id(id: &str) -> crate::error::Result<Option<Model>> {
+    Ok(
+      Entity::find_by_id(id)
+        .one(super::DATABASE.get().unwrap())
+        .await?,
+    )
   }
 }
