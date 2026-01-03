@@ -29,7 +29,8 @@ export function useIsMobile() {
   return !!isMobile;
 }
 
-interface EnvMobile {
+interface PlatformEnv {
+  isDesktop: boolean;
   isMobile: boolean;
   init: () => Promise<void>;
 }
@@ -37,10 +38,11 @@ interface EnvMobile {
 /**
  * 适用于检查当前的环境是否为移动端
  */
-export const useEnvMobile: ReadonlyStore<EnvMobile> = create((set) => ({
-  isMobile: false,
+export const usePlatform: ReadonlyStore<PlatformEnv> = create((set) => ({
+  isDesktop: false,
+  isMobile: true,
   init: async () => {
     const isMobile: boolean = await invoke("env_is_mobile");
-    set({ isMobile });
+    set({ isDesktop: !isMobile, isMobile });
   },
 }));

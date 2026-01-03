@@ -18,20 +18,19 @@ import {
 import "@/styles/globals.css";
 import { NavChatGroup, NavNoteGroup } from "@/app/nav-scope";
 import { NavSearch } from "@/app/nav-search";
-import { useEnvMobile } from "@/hooks/use-mobile";
+import { usePlatform } from "@/hooks/use-mobile";
 import { useNavMenu } from "@/hooks/use-nav";
 import { usePersona } from "@/hooks/use-persona";
 
-// noinspection SpellCheckingInspection
 const jetbrainsMono = localFont({
   src: [
     {
-      path: "./fonts/JetBrainsMono[wght].woff2",
+      path: "../fonts/JetBrainsMono.woff2",
       weight: "100 800",
       style: "normal",
     },
     {
-      path: "./fonts/JetBrainsMono-Italic[wght].woff2",
+      path: "../fonts/JetBrainsMono-Italic.woff2",
       weight: "100 800",
       style: "italic",
     },
@@ -86,7 +85,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   useEffect(() => {
-    void useEnvMobile.getState().init();
+    void usePlatform.getState().init();
     void useNavMenu.getState().update();
     void usePersona.getState().update();
   }, []);

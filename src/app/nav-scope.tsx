@@ -1,4 +1,8 @@
+"use client";
+
 import { ChevronRightIcon, FilePlusCornerIcon, MessageSquarePlusIcon } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   SidebarGroup,
@@ -70,6 +74,11 @@ function NavChatGroup({ group }: { group: NavScope[] }) {
 
 function NavNoteGroup() {
   const notes = useNavMenu((state) => state.notes);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currUrl = `${pathname}?${searchParams.toString()}`;
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>笔记</SidebarGroupLabel>
@@ -97,8 +106,11 @@ function NavNoteGroup() {
                     {item.notes.map((subItem) => (
                       <SidebarMenuButton
                         key={subItem.title}
-                        isActive={subItem.title === "button.tsx"}
+                        isActive={currUrl === `/note?id=${subItem.id}`}
                         className="data-[active=true]:bg-transparent"
+                        onClick={() => {
+                          router.push(`/note?id=${subItem.id}`);
+                        }}
                       >
                         {subItem.title}
                       </SidebarMenuButton>
