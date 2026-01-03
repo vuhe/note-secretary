@@ -14,7 +14,7 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
 } from "@/components/ui/sidebar";
-import { useChatId } from "@/hooks/use-chat-id";
+import { useChatId } from "@/hooks/use-chat";
 import { useNavMenu } from "@/hooks/use-nav";
 
 interface NavScopeItem {

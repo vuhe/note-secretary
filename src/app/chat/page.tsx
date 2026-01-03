@@ -14,7 +14,7 @@ import {
 } from "@/components/ai-elements/conversation";
 import { Loader } from "@/components/ai-elements/loader";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { useChatContext, useChatId } from "@/hooks/use-chat-id";
+import { useChatContext, useChatId } from "@/hooks/use-chat";
 
 export default function Page() {
   const loading = useChatId((state) => state.loading);

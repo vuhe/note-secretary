@@ -9,10 +9,7 @@ type ReadonlyStore<T> = UseBoundStore<ReadonlyStoreApi<T>>;
 
 type MessagesSetter = (messages: UIMessage[]) => void;
 
-const idGenerator = createIdGenerator({
-  prefix: "chat",
-  size: 16,
-});
+const idGenerator = createIdGenerator({ prefix: "chat" });
 
 interface ChatId {
   id: string;

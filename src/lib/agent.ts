@@ -7,7 +7,7 @@ import {
   type UIMessage,
   type UIMessageChunk,
 } from "ai";
-import { useChatId } from "@/hooks/use-chat-id";
+import { useChatId } from "@/hooks/use-chat";
 import type { Persona } from "@/hooks/use-persona";
 import { safeErrorString } from "@/lib/utils";
 
