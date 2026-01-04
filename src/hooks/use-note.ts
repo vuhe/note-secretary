@@ -49,11 +49,10 @@ export function useNote() {
   const modeChange = useCallback(() => {
     if (status.status !== "success") return;
     if (editing) {
-      // invoke id draft
+      // TODO: invoke save id draft
       const newNote = { ...status.value, content: draft };
       setStatus({ status: "success", value: newNote });
       setEditing(false);
-      setDraft("");
       return;
     }
     setEditing(true);

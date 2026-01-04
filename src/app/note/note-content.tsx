@@ -8,17 +8,20 @@ import { GFM } from "@lezer/markdown";
 import type { Root } from "hast";
 import { useCallback, useEffect, useRef } from "react";
 import { defaultRehypePlugins, Streamdown } from "streamdown";
-import { Separator } from "@/components/ui/separator";
-import type { Note } from "@/hooks/use-note";
+
+import { usePlatform } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 const EditorStyle = HighlightStyle.define([
   // --- 代码与逻辑 ---
   { tag: t.comment, color: "var(--muted-foreground)", fontStyle: "italic" }, // 注释
   { tag: t.keyword, color: "var(--chart-1)" }, // 关键字
   { tag: t.name, color: "var(--chart-4)" }, // 标识符
-  { tag: t.literal, color: "var(--chart-3)" }, // 字面量
+  { tag: t.literal, color: "var(--muted-foreground)" }, // 字面量
   { tag: t.operator, color: "var(--chart-2)" }, // 操作符
   { tag: t.punctuation, color: "var(--chart-5)" }, // 标点符号
+  { tag: t.variableName, color: "var(--primary)" }, // 变量名
+  { tag: t.propertyName, color: "var(--chart-3)" }, // 字段名
   // --- 标题系列 (h1 - h6) ---
   {
     tag: [t.heading1, t.heading2, t.heading3],
@@ -43,13 +46,16 @@ const EditorStyle = HighlightStyle.define([
 ]);
 
 interface NoteContentProps {
-  note: Note;
+  id: string;
+  content: string;
   editing: boolean;
   draft: string;
   setDraft: (s: string) => void;
 }
 
-export default function NoteContent({ note, editing, draft, setDraft }: NoteContentProps) {
+export default function NoteContent({ id, content, editing, draft, setDraft }: NoteContentProps) {
+  const isMobile = usePlatform((state) => state.isMobile);
+
   const treeDataRef = useRef<Root>(null);
   const editorElementListRef = useRef<number[]>([]);
   const previewElementListRef = useRef<number[]>([]);
@@ -191,11 +197,12 @@ export default function NoteContent({ note, editing, draft, setDraft }: NoteCont
   }, [computePositions]);
 
   // 初始化编辑器
+  // biome-ignore lint/correctness/useExhaustiveDependencies: recreate only id change
   useEffect(() => {
-    if (!editorAreaRef.current) return;
+    if (isMobile || !editorAreaRef.current) return;
 
     const state = EditorState.create({
-      doc: note.content,
+      doc: content,
       extensions: [
         lineNumbers(),
         highlightWhitespace(),
@@ -251,12 +258,17 @@ export default function NoteContent({ note, editing, draft, setDraft }: NoteCont
     return () => {
       view.destroy();
     };
-  }, [onEditorScroll, note.content, setDraft]);
+  }, [isMobile, onEditorScroll, id, setDraft]);
 
   return (
-    <div className="flex size-full">
-      <div ref={editorAreaRef} className="flex-1 h-full" />
-      <Separator orientation="vertical" />
+    <div className="group flex size-full" data-state={editing ? "expanded" : "collapsed"}>
+      <div
+        ref={editorAreaRef}
+        className={cn(
+          "h-full transition-[width,opacity] duration-400 ease-in-out border-r border-r-border",
+          "w-1/2 group-data-[state=collapsed]:w-0 group-data-[state=collapsed]:opacity-0",
+        )}
+      />
       {/** biome-ignore lint/a11y/noStaticElementInteractions: ignore it */}
       <div
         ref={previewAreaRef}

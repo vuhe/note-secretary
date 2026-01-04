@@ -34,7 +34,13 @@ export default function Page() {
         ) : status.status === "error" ? (
           <NoteError error={status.value} />
         ) : (
-          <NoteContent note={status.value} editing={editing} draft={draft} setDraft={setDraft} />
+          <NoteContent
+            id={status.value.id}
+            content={status.value.content}
+            editing={editing}
+            draft={draft}
+            setDraft={setDraft}
+          />
         )}
       </div>
     </SidebarInset>
