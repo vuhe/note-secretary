@@ -17,6 +17,7 @@ import { Reasoning, ReasoningContent, ReasoningTrigger } from "@/components/ai-e
 import { Source, Sources, SourcesContent, SourcesTrigger } from "@/components/ai-elements/sources";
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
 import { Task, TaskContent, TaskItem, TaskTrigger } from "@/components/ai-elements/task";
+import { usePlatform } from "@/hooks/use-mobile";
 
 interface MessageProps {
   message: UIMessage;
@@ -35,6 +36,7 @@ function filename(file: FileUIPart) {
 }
 
 function AgentMessage({ message, status, last }: AgentMessageProps) {
+  const isDesktop = usePlatform((state) => state.isDesktop);
   const showActions = !last || status === "error" || status === "ready";
   const sources = message.parts.filter(
     (part) => part.type === "source-url" || part.type === "source-document",
@@ -69,13 +71,13 @@ function AgentMessage({ message, status, last }: AgentMessageProps) {
                 <MessageContent>
                   <MessageResponse
                     controls={{
-                      table: true,
+                      table: isDesktop,
                       code: true,
                       mermaid: {
-                        download: true,
+                        download: isDesktop,
                         copy: true,
                         fullscreen: false,
-                        panZoom: true,
+                        panZoom: isDesktop,
                       },
                     }}
                   >

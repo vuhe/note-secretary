@@ -130,30 +130,4 @@
     /*noinspection CssNoGenericFontName*/
     font-family: var(--font-sans);
   }
-  .milkdown {
-    --crepe-color-background: var(--background);
-    --crepe-color-on-background: var(--foreground);
-    --crepe-color-surface: var(--card);
-    --crepe-color-surface-low: var(--muted);
-    --crepe-color-on-surface: var(--foreground);
-    --crepe-color-on-surface-variant: var(--muted-foreground);
-    --crepe-color-outline: var(--border);
-    --crepe-color-primary: var(--primary);
-    --crepe-color-secondary: var(--secondary);
-    --crepe-color-on-secondary: var(--secondary-foreground);
-    --crepe-color-inverse: var(--foreground);
-    --crepe-color-on-inverse: var(--background);
-    --crepe-color-inline-code: var(--primary);
-    --crepe-color-error: var(--destructive);
-    --crepe-color-hover: var(--accent);
-    --crepe-color-selected: var(--accent);
-    --crepe-color-inline-area: var(--muted);
-
-    --crepe-font-title: var(--font-sans);
-    --crepe-font-default: var(--font-sans);
-    --crepe-font-code: var(--font-mono);
-
-    --crepe-shadow-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
-    --crepe-shadow-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
-  }
 }

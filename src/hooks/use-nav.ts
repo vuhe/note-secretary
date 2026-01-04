@@ -50,8 +50,6 @@ export const useNavMenu: ReadonlyStore<NavMenu> = create((set) => ({
         };
       });
 
-    console.debug(noteList);
-    console.debug(sortedCategories);
     set({ notes: sortedCategories });
   },
 }));

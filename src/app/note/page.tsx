@@ -4,10 +4,12 @@ import NoteContent from "@/app/note/note-content";
 import { NoteError, NoteLoading } from "@/app/note/note-loading";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { usePlatform } from "@/hooks/use-mobile";
 import { useNote } from "@/hooks/use-note";
 
 export default function Page() {
-  const status = useNote();
+  const isDesktop = usePlatform((state) => state.isDesktop);
+  const { status, editing, modeChange, draft, setDraft } = useNote();
   const title =
     status.status === "success" ? `${status.value.category} - ${status.value.title}` : "加载中……";
 
@@ -18,16 +20,11 @@ export default function Page() {
           <SidebarTrigger className="-ml-1 mr-2" />
           <div className="text-base font-medium">{title}</div>
           <div className="ml-auto flex items-center gap-2">
-            <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
-              <a
-                href="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
-                rel="noopener noreferrer"
-                target="_blank"
-                className="dark:text-foreground"
-              >
-                GitHub
-              </a>
-            </Button>
+            {isDesktop && (
+              <Button size="sm" onClick={modeChange}>
+                {editing ? "提交" : "编辑"}
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -37,7 +34,7 @@ export default function Page() {
         ) : status.status === "error" ? (
           <NoteError error={status.value} />
         ) : (
-          <NoteContent note={status.value} />
+          <NoteContent note={status.value} editing={editing} draft={draft} setDraft={setDraft} />
         )}
       </div>
     </SidebarInset>
