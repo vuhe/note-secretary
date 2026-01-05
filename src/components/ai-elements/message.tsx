@@ -4,8 +4,8 @@ import type { FileUIPart, UIMessage } from "ai";
 import { PaperclipIcon, XIcon } from "lucide-react";
 import type { ComponentProps, HTMLAttributes } from "react";
 import { memo } from "react";
-import { Streamdown } from "streamdown";
 
+import { MarkdownDisplay, type MarkdownDisplayProps } from "@/components/markdown/display";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -70,12 +70,12 @@ export const MessageAction = ({
   );
 };
 
-export type MessageResponseProps = ComponentProps<typeof Streamdown>;
+export type MessageResponseProps = MarkdownDisplayProps;
 
 // biome-ignore lint/style/useComponentExportOnlyModules: React.memo Component
 export const MessageResponse = memo(
   ({ className, ...props }: MessageResponseProps) => (
-    <Streamdown
+    <MarkdownDisplay
       className={cn("size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)}
       {...props}
     />

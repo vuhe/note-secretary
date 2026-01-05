@@ -35,7 +35,6 @@ export default function Page() {
           <NoteError error={status.value} />
         ) : (
           <NoteContent
-            id={status.value.id}
             content={status.value.content}
             editing={editing}
             draft={draft}

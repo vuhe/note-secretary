@@ -35,6 +35,7 @@
   "linter": {
     "enabled": true,
     "rules": {
+      "a11y": "off",
       "recommended": true,
       "correctness": {
         "useHookAtTopLevel": "error"

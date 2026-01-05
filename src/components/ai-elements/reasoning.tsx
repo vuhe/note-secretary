@@ -4,8 +4,8 @@ import { useControllableState } from "@radix-ui/react-use-controllable-state";
 import { BrainIcon, ChevronDownIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import { createContext, memo, useContext, useEffect, useState } from "react";
-import { Streamdown } from "streamdown";
 
+import { MarkdownDisplay } from "@/components/markdown/display";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { Shimmer } from "./shimmer";
@@ -165,7 +165,7 @@ export const ReasoningContent = memo(({ className, children, ...props }: Reasoni
     )}
     {...props}
   >
-    <Streamdown {...props}>{children}</Streamdown>
+    <MarkdownDisplay {...props}>{children}</MarkdownDisplay>
   </CollapsibleContent>
 ));
 

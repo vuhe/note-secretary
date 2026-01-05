@@ -87,7 +87,6 @@ function Field({
   ...props
 }: ComponentProps<"div"> & VariantProps<typeof fieldVariants>) {
   return (
-    // biome-ignore lint/a11y/useSemanticElements: allow custom role
     <div
       role="group"
       data-slot="field"

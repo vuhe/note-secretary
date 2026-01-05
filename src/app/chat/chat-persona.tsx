@@ -9,7 +9,6 @@ import {
   ModelSelectorInput,
   ModelSelectorItem,
   ModelSelectorList,
-  ModelSelectorLogo,
   ModelSelectorName,
   ModelSelectorTrigger,
 } from "@/components/ai-elements/model-selector";
@@ -47,7 +46,7 @@ export default function ChatPersona() {
                     }}
                     value={m.id}
                   >
-                    <ModelSelectorLogo provider={m.provider} />
+                    <DramaIcon size={12} />
                     <ModelSelectorName>{m.id}</ModelSelectorName>
                     {selected?.id === m.id ? (
                       <CheckIcon className="ml-auto size-4" />

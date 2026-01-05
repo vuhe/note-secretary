@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 
 function InputGroup({ className, ...props }: ComponentProps<"div">) {
   return (
-    // biome-ignore lint/a11y/useSemanticElements: ignore
     <div
       data-slot="input-group"
       role="group"
@@ -75,8 +74,6 @@ function InputGroupAddon({
   ...props
 }: ComponentProps<"div"> & VariantProps<typeof inputGroupAddonVariants>) {
   return (
-    // biome-ignore lint/a11y/useKeyWithClickEvents: ignore
-    // biome-ignore lint/a11y/useSemanticElements: ignore
     <div
       role="group"
       data-slot="input-group-addon"

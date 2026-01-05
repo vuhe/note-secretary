@@ -26,19 +26,25 @@ export type NoteStatus =
 
 export function useNote() {
   const searchParams = useSearchParams();
+  const [prevId, setPrevId] = useState<string | null>(null);
+
   const [status, setStatus] = useState<NoteStatus>({ status: "loading" });
   const [editing, setEditing] = useState<boolean>(false);
   const [draft, setDraft] = useState<string>("");
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  const currentId = searchParams.get("id") ?? "";
+  if (currentId !== prevId) {
+    setPrevId(currentId);
     setEditing(false);
     setDraft("");
+    setStatus({ status: "loading" });
+  }
+
+  useEffect(() => {
     invoke("get_note_by_id", { id: searchParams.get("id") ?? "" }).then(
       (note) => {
         const value = note as Note;
         setStatus({ status: "success", value });
-        setDraft(value.content);
       },
       (error: unknown) => {
         setStatus({ status: "error", value: safeError(error) });
@@ -49,12 +55,14 @@ export function useNote() {
   const modeChange = useCallback(() => {
     if (status.status !== "success") return;
     if (editing) {
+      setEditing(false);
       // TODO: invoke save id draft
       const newNote = { ...status.value, content: draft };
       setStatus({ status: "success", value: newNote });
-      setEditing(false);
+      setDraft("");
       return;
     }
+    setDraft(status.value.content);
     setEditing(true);
   }, [editing, draft, status]);
 
