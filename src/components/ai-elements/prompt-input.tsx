@@ -189,6 +189,7 @@ export function PromptInputProvider({
 
   // Keep a ref to attachments for cleanup on unmounting (avoids stale closure)
   const attachmentsRef = useRef(attachmentFiles);
+  // eslint-disable-next-line react-hooks/refs
   attachmentsRef.current = attachmentFiles;
 
   // Clean up blob URLs on unmounting to prevent memory leaks
@@ -254,7 +255,7 @@ export function PromptInputProvider({
 
 const LocalAttachmentsContext = createContext<AttachmentsContext | null>(null);
 
-export const usePromptInputAttachments = () => {
+const usePromptInputAttachments = () => {
   // Dual-mode: prefer provider if present, otherwise use local
   const provider = useOptionalProviderAttachments();
   const local = useContext(LocalAttachmentsContext);
@@ -452,6 +453,7 @@ export const PromptInput = ({
 
   // Keep a ref to files for cleanup on unmounting (avoids stale closure)
   const filesRef = useRef(files);
+  // eslint-disable-next-line react-hooks/refs
   filesRef.current = files;
 
   const openFileDialogLocal = useCallback(() => {

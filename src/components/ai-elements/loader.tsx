@@ -8,6 +8,7 @@ interface LoaderIconProps {
   size?: number;
 }
 
+// noinspection SpellCheckingInspection
 const LoaderIcon = ({ size = 16 }: LoaderIconProps) => (
   <svg
     height={size}

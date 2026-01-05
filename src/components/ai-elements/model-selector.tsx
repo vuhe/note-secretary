@@ -83,6 +83,7 @@ export const ModelSelectorSeparator = (props: ModelSelectorSeparatorProps) => (
 );
 
 export type ModelSelectorLogoProps = Omit<ComponentProps<"img">, "src" | "alt"> & {
+  // noinspection SpellCheckingInspection
   provider:
     | "moonshotai-cn"
     | "lucidquery"
@@ -159,7 +160,8 @@ export type ModelSelectorLogoGroupProps = ComponentProps<"div">;
 export const ModelSelectorLogoGroup = ({ className, ...props }: ModelSelectorLogoGroupProps) => (
   <div
     className={cn(
-      "-space-x-1 flex shrink-0 items-center [&>img]:rounded-full [&>img]:bg-background [&>img]:p-px [&>img]:ring-1 dark:[&>img]:bg-foreground",
+      "-space-x-1 flex shrink-0 items-center",
+      "[&>img]:rounded-full [&>img]:bg-background [&>img]:p-px [&>img]:ring-1 dark:[&>img]:bg-foreground",
       className,
     )}
     {...props}
