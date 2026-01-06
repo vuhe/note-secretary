@@ -5,6 +5,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
+import { type HTMLMotionProps, motion } from "motion/react";
 import type { ComponentProps, CSSProperties } from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
@@ -300,10 +301,14 @@ function SidebarRail({ className, ...props }: ComponentProps<"button">) {
   );
 }
 
-function SidebarInset({ className, ...props }: ComponentProps<"main">) {
+function SidebarInset({ className, ...props }: HTMLMotionProps<"main">) {
   return (
-    <main
+    <motion.main
       data-slot="sidebar-inset"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
       className={cn(
         "bg-background relative flex w-full h-svh flex-1 flex-col",
         "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:h-[calc(100svh-1rem)]",

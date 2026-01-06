@@ -1,6 +1,7 @@
 "use client";
 
 import { SettingsIcon } from "lucide-react";
+import { AnimatePresence } from "motion/react";
 import localFont from "next/font/local";
 import { ThemeProvider } from "next-themes";
 import { type ComponentProps, type CSSProperties, type ReactNode, useEffect } from "react";
@@ -103,7 +104,7 @@ export default function RootLayout({
             }
           >
             <AppSidebar variant="inset" />
-            {children}
+            <AnimatePresence mode="wait">{children}</AnimatePresence>
           </SidebarProvider>
         </ThemeProvider>
       </body>
