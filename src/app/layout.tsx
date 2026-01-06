@@ -19,9 +19,11 @@ import {
 import "@/styles/globals.css";
 import { NavChatGroup, NavNoteGroup } from "@/app/nav-scope";
 import { NavSearch } from "@/app/nav-search";
+import { Toaster } from "@/components/ui/sonner";
 import { usePlatform } from "@/hooks/use-mobile";
 import { useNavMenu } from "@/hooks/use-nav";
 import { usePersona } from "@/hooks/use-persona";
+import { useToaster } from "@/hooks/use-toaster";
 
 const jetbrainsMono = localFont({
   src: [
@@ -91,6 +93,8 @@ export default function RootLayout({
     void usePersona.getState().update();
   }, []);
 
+  useToaster();
+
   return (
     <html lang="zh" suppressHydrationWarning>
       <body className={`${jetbrainsMono.variable} antialiased overflow-hidden`}>
@@ -106,6 +110,7 @@ export default function RootLayout({
             <AppSidebar variant="inset" />
             <AnimatePresence mode="wait">{children}</AnimatePresence>
           </SidebarProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

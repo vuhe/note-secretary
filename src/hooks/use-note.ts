@@ -56,7 +56,7 @@ export function useNote() {
     if (status.status !== "success") return;
     if (editing) {
       setEditing(false);
-      // TODO: invoke save id draft
+      void invoke("modify_note_content", { id: status.value.id, content: draft });
       const newNote = { ...status.value, content: draft };
       setStatus({ status: "success", value: newNote });
       setDraft("");

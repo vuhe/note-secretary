@@ -1,7 +1,6 @@
 "use client";
 
-import { RefreshCwIcon } from "lucide-react";
-import { Loader } from "@/components/ai-elements/loader";
+import { Loader2Icon, RefreshCwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -16,7 +15,7 @@ export function NoteLoading() {
     <Empty>
       <EmptyContent>
         <EmptyDescription className="flex items-center justify-center gap-2">
-          <Loader />
+          <Loader2Icon className="size-4 animate-spin" />
           正在加载笔记……
         </EmptyDescription>
       </EmptyContent>

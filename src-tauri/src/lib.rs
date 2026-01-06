@@ -1,5 +1,6 @@
 mod command;
 mod database;
+mod emitter;
 mod error;
 
 use command::AppCommand;
@@ -77,6 +78,9 @@ pub fn run() {
         let window = win_builder.build()?;
         set_macos_title_bar(&window)?;
       }
+
+      // 设置全局事件通知器
+      emitter::setup_emitter(app)?;
 
       // 设置数据库和向量引擎
       let work_dir = get_work_dir(&app)?;
