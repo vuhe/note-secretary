@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquareIcon } from "lucide-react";
+import { Loader2Icon, MessageSquareIcon } from "lucide-react";
 
 import ChatContext from "@/app/chat/chat-context";
 import ChatInput from "@/app/chat/chat-input";
@@ -12,7 +12,6 @@ import {
   ConversationEmptyState,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
-import { Loader } from "@/components/ai-elements/loader";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { useChatContext, useChatId } from "@/hooks/use-chat";
 
@@ -56,7 +55,12 @@ export default function Page() {
                 />
               ))
             )}
-            {status === "submitted" && <Loader />}
+            {status === "submitted" && (
+              <div className="inline-flex items-center justify-center text-muted-foreground gap-1">
+                <Loader2Icon className="size-4 animate-spin" />
+                <span className="text-sm">正在加载……</span>
+              </div>
+            )}
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
