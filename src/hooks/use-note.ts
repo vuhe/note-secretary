@@ -52,25 +52,22 @@ export function useNote() {
     );
   }, [searchParams]);
 
-  const modeChange = useCallback(() => {
+  const submitDraft = useCallback(() => {
     if (status.status !== "success") return;
-    if (editing) {
-      setEditing(false);
-      void invoke("modify_note_content", { id: status.value.id, content: draft });
-      const newNote = { ...status.value, content: draft };
-      setStatus({ status: "success", value: newNote });
-      setDraft("");
-      return;
-    }
-    setDraft(status.value.content);
-    setEditing(true);
-  }, [editing, draft, status]);
+    setEditing(false);
+    void invoke("modify_note_content", { id: status.value.id, content: draft });
+    const newNote = { ...status.value, content: draft };
+    setStatus({ status: "success", value: newNote });
+    setDraft("");
+    return;
+  }, [draft, status]);
 
   return {
     status,
     editing,
-    modeChange,
+    setEditing,
     draft,
     setDraft,
+    submitDraft,
   };
 }

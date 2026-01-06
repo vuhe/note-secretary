@@ -12,6 +12,7 @@ pub fn setup_emitter(app: &App) -> tauri::Result<()> {
   Ok(())
 }
 
+#[allow(dead_code)]
 pub fn event<S: Serialize + Clone>(event: &str, payload: S) {
   let Some(app_handle) = APP_HANDLE.get() else {
     return;

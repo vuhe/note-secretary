@@ -2,14 +2,14 @@
 
 import NoteContent from "@/app/note/note-content";
 import { NoteError, NoteLoading } from "@/app/note/note-loading";
-import { Button } from "@/components/ui/button";
+import NoteToolbar from "@/app/note/note-toolbar";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { usePlatform } from "@/hooks/use-mobile";
 import { useNote } from "@/hooks/use-note";
 
 export default function Page() {
   const isDesktop = usePlatform((state) => state.isDesktop);
-  const { status, editing, modeChange, draft, setDraft } = useNote();
+  const { status, editing, setEditing, draft, setDraft, submitDraft } = useNote();
   const title =
     status.status === "success" ? `${status.value.category} - ${status.value.title}` : "加载中……";
 
@@ -19,13 +19,15 @@ export default function Page() {
         <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
           <SidebarTrigger className="-ml-1 mr-2" />
           <div className="text-base font-medium">{title}</div>
-          <div className="ml-auto flex items-center gap-2">
-            {isDesktop && (
-              <Button size="sm" onClick={modeChange}>
-                {editing ? "提交" : "编辑"}
-              </Button>
-            )}
-          </div>
+          {isDesktop && (
+            <NoteToolbar
+              status={status}
+              editing={editing}
+              setEditing={setEditing}
+              setDraft={setDraft}
+              submitDraft={submitDraft}
+            />
+          )}
         </div>
       </header>
       <div className="@container/main flex flex-1 flex-col min-h-0">

@@ -51,4 +51,13 @@ impl Model {
         .await?,
     )
   }
+
+  pub async fn update_content(id: &str, content: String) -> crate::error::Result<()> {
+    Entity::update_many()
+      .col_expr(Column::Content, Expr::value(content))
+      .filter(Column::Id.eq(id))
+      .exec(super::DATABASE.get().unwrap())
+      .await?;
+    Ok(())
+  }
 }
