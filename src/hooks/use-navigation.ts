@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -58,8 +59,17 @@ export function useNavigation() {
     );
   }, []);
 
+  // 初始化调用一次准备数据
   useEffect(() => {
     getAllNotes();
+  }, [getAllNotes]);
+
+  // 监听到后台传递的 note 信息变动，刷新数据
+  useEffect(() => {
+    const listening = listen("notes-change-event", getAllNotes);
+    return () => {
+      void listening.then((unlisten) => unlisten);
+    };
   }, [getAllNotes]);
 
   return {

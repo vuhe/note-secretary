@@ -10,7 +10,7 @@ interface ToasterEvent {
 
 export function useToaster() {
   useEffect(() => {
-    const unlistenPromise = listen<ToasterEvent>("toaster", (event) => {
+    const listening = listen<ToasterEvent>("toaster", (event) => {
       switch (event.payload.type) {
         case "info": {
           toast.info(event.payload.title, {
@@ -44,9 +44,7 @@ export function useToaster() {
     });
 
     return () => {
-      void unlistenPromise.then((unlisten) => {
-        unlisten();
-      });
+      void listening.then((unlisten) => unlisten);
     };
   }, []);
 }

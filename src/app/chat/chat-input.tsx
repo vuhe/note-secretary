@@ -1,3 +1,5 @@
+"use client";
+
 import type { ChatRequestOptions, ChatStatus, FileUIPart } from "ai";
 import { GlobeIcon, PlusIcon } from "lucide-react";
 import { useCallback, useState } from "react";

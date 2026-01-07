@@ -1,3 +1,5 @@
+"use client";
+
 import { CheckIcon, DramaIcon } from "lucide-react";
 import { useState } from "react";
 

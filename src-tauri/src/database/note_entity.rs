@@ -1,9 +1,9 @@
-use sea_orm::QuerySelect;
 use sea_orm::entity::prelude::*;
-use serde::Serialize;
+use sea_orm::{IntoActiveModel, QuerySelect};
+use serde::{Deserialize, Serialize};
 
 #[sea_orm::model]
-#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Deserialize, Serialize)]
 #[sea_orm(table_name = "notes")]
 pub struct Model {
   /// id，唯一标识符，UUID
@@ -16,8 +16,9 @@ pub struct Model {
   #[sea_orm(unique_key = "item")]
   pub title: String,
   /// 总结，用于AI问答和搜寻
-  pub summary: Option<String>,
+  pub summary: String,
   /// 正文，markdown
+  #[serde(default)]
   pub content: String,
 }
 
@@ -52,10 +53,34 @@ impl Model {
     )
   }
 
-  pub async fn update_content(id: &str, content: String) -> crate::error::Result<()> {
+  pub async fn insert(&self) -> crate::error::Result<()> {
+    let model = self.clone().into_active_model();
+    model.insert(super::DATABASE.get().unwrap()).await?;
+    Ok(())
+  }
+
+  pub async fn update_metadata(&self) -> crate::error::Result<()> {
+    Entity::update_many()
+      .col_expr(Column::Category, Expr::value(self.category.clone()))
+      .col_expr(Column::Title, Expr::value(self.title.clone()))
+      .col_expr(Column::Summary, Expr::value(self.summary.clone()))
+      .filter(Column::Id.eq(self.id.clone()))
+      .exec(super::DATABASE.get().unwrap())
+      .await?;
+    Ok(())
+  }
+
+  pub async fn update_content<'a>(id: &'a str, content: &'a str) -> crate::error::Result<()> {
     Entity::update_many()
       .col_expr(Column::Content, Expr::value(content))
       .filter(Column::Id.eq(id))
+      .exec(super::DATABASE.get().unwrap())
+      .await?;
+    Ok(())
+  }
+
+  pub async fn delete_by_id(id: &str) -> crate::error::Result<()> {
+    Entity::delete_by_id(id)
       .exec(super::DATABASE.get().unwrap())
       .await?;
     Ok(())

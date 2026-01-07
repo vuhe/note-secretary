@@ -1,3 +1,5 @@
+"use client";
+
 import { GlobeIcon } from "lucide-react";
 import {
   PromptInputButton,
