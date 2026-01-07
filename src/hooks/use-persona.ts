@@ -2,7 +2,9 @@ import { createDeepSeek } from "@ai-sdk/deepseek";
 import { invoke } from "@tauri-apps/api/core";
 import { fetch } from "@tauri-apps/plugin-http";
 import type { LanguageModel } from "ai";
+import { toast } from "sonner";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
+import { safeErrorString } from "@/lib/utils";
 
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, "getState" | "getInitialState" | "subscribe">;
 type ReadonlyStore<T> = UseBoundStore<ReadonlyStoreApi<T>>;
@@ -60,7 +62,7 @@ export class Persona {
         break;
       }
       default:
-        throw new Error(`暂不支持 ${this.provider} 提供商`);
+        throw new Error(`此版本不支持 ${this.provider} 提供商，请检查是否需要升级`);
     }
 
     if (typeof props.maxOutputTokens === "number") {
@@ -119,13 +121,19 @@ export const usePersona: ReadonlyStore<PersonaStatus> = create((set, get) => ({
     set({ selected });
   },
   update: async () => {
-    // TODO: 这里的两个方法都有抛出异常的可能
-    const list: Record<string, unknown>[] = await invoke("get_all_personas");
-    const personas = list.map((it) => new Persona(it));
-    const providers = personas.reduce((prev, curr) => {
-      prev.add(curr.provider);
-      return prev;
-    }, new Set<string>());
-    set({ personas, providers: Array.from(providers.values()) });
+    try {
+      const list: Record<string, unknown>[] = await invoke("get_all_personas");
+      const personas = list.map((it) => new Persona(it));
+      const providers = personas.reduce((prev, curr) => {
+        prev.add(curr.provider);
+        return prev;
+      }, new Set<string>());
+      set({ personas, providers: Array.from(providers.values()) });
+    } catch (error) {
+      toast.error("获取 Persona 列表失败", {
+        description: safeErrorString(error),
+        closeButton: true,
+      });
+    }
   },
 }));

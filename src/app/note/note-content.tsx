@@ -4,10 +4,11 @@ import { AnimatePresence, motion } from "motion/react";
 
 import { MarkdownDisplay } from "@/components/markdown/display";
 import { MarkdownSplitView } from "@/components/markdown/split";
+import type { NoteEditStatus } from "@/hooks/use-note";
 
 interface NoteContentProps {
   content: string;
-  editing: boolean;
+  editing: NoteEditStatus;
   draft: string;
   setDraft: (s: string) => void;
 }
@@ -15,7 +16,7 @@ interface NoteContentProps {
 export default function NoteContent({ content, editing, draft, setDraft }: NoteContentProps) {
   return (
     <AnimatePresence mode="wait">
-      {editing ? (
+      {editing !== "display" ? (
         <motion.div
           className="flex size-full"
           key="editor"

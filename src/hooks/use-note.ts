@@ -1,7 +1,8 @@
 import { invoke } from "@tauri-apps/api/core";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { safeError } from "@/lib/utils";
+import { toast } from "sonner";
+import { safeError, safeErrorString } from "@/lib/utils";
 
 export interface Note {
   id: string;
@@ -24,27 +25,28 @@ export type NoteStatus =
       value: Error;
     };
 
+export type NoteEditStatus = "display" | "editing" | "submitting";
+
 export function useNote() {
   const searchParams = useSearchParams();
   const [prevId, setPrevId] = useState<string | null>(null);
 
   const [status, setStatus] = useState<NoteStatus>({ status: "loading" });
-  const [editing, setEditing] = useState<boolean>(false);
+  const [editing, setEditing] = useState<NoteEditStatus>("display");
   const [draft, setDraft] = useState<string>("");
 
   const currentId = searchParams.get("id") ?? "";
   if (currentId !== prevId) {
     setPrevId(currentId);
-    setEditing(false);
+    setEditing("display");
     setDraft("");
     setStatus({ status: "loading" });
   }
 
   useEffect(() => {
-    invoke("get_note_by_id", { id: searchParams.get("id") ?? "" }).then(
+    invoke<Note>("get_note_by_id", { id: searchParams.get("id") ?? "" }).then(
       (note) => {
-        const value = note as Note;
-        setStatus({ status: "success", value });
+        setStatus({ status: "success", value: note });
       },
       (error: unknown) => {
         setStatus({ status: "error", value: safeError(error) });
@@ -54,12 +56,22 @@ export function useNote() {
 
   const submitDraft = useCallback(() => {
     if (status.status !== "success") return;
-    setEditing(false);
-    void invoke("modify_note_content", { id: status.value.id, content: draft });
-    const newNote = { ...status.value, content: draft };
-    setStatus({ status: "success", value: newNote });
-    setDraft("");
-    return;
+    setEditing("submitting");
+    invoke("modify_note_content", { id: status.value.id, content: draft }).then(
+      () => {
+        setEditing("display");
+        const newNote = { ...status.value, content: draft };
+        setStatus({ status: "success", value: newNote });
+        setDraft("");
+      },
+      (error: unknown) => {
+        setEditing("editing");
+        toast.error("保存笔记失败", {
+          description: safeErrorString(error),
+          closeButton: true,
+        });
+      },
+    );
   }, [draft, status]);
 
   return {

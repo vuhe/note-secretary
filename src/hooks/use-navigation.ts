@@ -25,7 +25,7 @@ export function useNavigation() {
   const [notes, setNotes] = useState<NavNoteCategory[]>([]);
 
   const getAllNotes = useCallback(() => {
-    void invoke<NavNote[]>("get_all_notes").then(
+    invoke<NavNote[]>("get_all_notes").then(
       (noteList) => {
         const categoryMap: Record<string, NavNote[]> = {};
         noteList.forEach((note) => {

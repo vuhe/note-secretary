@@ -36,6 +36,7 @@ pub fn warning<'a>(title: &'a str, description: Option<&'a str>) {
   app_handle.emit("toaster", payload).ok();
 }
 
+#[allow(dead_code)]
 pub fn error<'a>(title: &'a str, description: Option<&'a str>) {
   let Some(app_handle) = APP_HANDLE.get() else {
     return;
@@ -48,6 +49,7 @@ pub fn error<'a>(title: &'a str, description: Option<&'a str>) {
   app_handle.emit("toaster", payload).ok();
 }
 
+#[allow(dead_code)]
 pub fn success<'a>(title: &'a str, description: Option<&'a str>) {
   let Some(app_handle) = APP_HANDLE.get() else {
     return;
