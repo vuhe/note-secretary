@@ -2,15 +2,18 @@ import { invoke } from "@tauri-apps/api/core";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { safeError, safeErrorString } from "@/lib/utils";
 
-export interface Note {
-  id: string;
-  category: string;
-  title: string;
-  summary?: string;
-  content: string;
-}
+export const NoteSchema = z.object({
+  id: z.string().trim().min(1, "ID 不能为空"),
+  category: z.string().trim().min(1, "分类不能为空"),
+  title: z.string().trim().min(1, "标题不能为空"),
+  summary: z.string(),
+  content: z.string(),
+});
+
+export type Note = z.infer<typeof NoteSchema>;
 
 export type NoteStatus =
   | {
@@ -54,6 +57,29 @@ export function useNote() {
     );
   }, [searchParams]);
 
+  const submitMetadata = useCallback(
+    (data: Note) => {
+      if (status.status !== "success") return;
+      console.debug(data);
+      invoke("modify_note_meta", { note: data }).then(
+        () => {
+          const newNote = { ...data, content: status.value.content };
+          setStatus({ status: "success", value: newNote });
+          toast.success("保存笔记元数据成功", {
+            closeButton: true,
+          });
+        },
+        (error: unknown) => {
+          toast.error("保存笔记元数据失败", {
+            description: safeErrorString(error),
+            closeButton: true,
+          });
+        },
+      );
+    },
+    [status],
+  );
+
   const submitDraft = useCallback(() => {
     if (status.status !== "success") return;
     setEditing("submitting");
@@ -80,6 +106,7 @@ export function useNote() {
     setEditing,
     draft,
     setDraft,
+    submitMetadata,
     submitDraft,
   };
 }
