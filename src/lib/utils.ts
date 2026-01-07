@@ -20,7 +20,7 @@ export function safeError(error: unknown) {
 export function safeErrorString(error: unknown) {
   if (error instanceof Error) return error.message;
   if (typeof error === "string") return error;
-  if (error == null) return "";
+  if (error == null) return "unknown error (error is null)";
   try {
     return JSON.stringify(error);
   } catch {

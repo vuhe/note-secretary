@@ -1,21 +1,49 @@
 "use client";
 
-import { ChevronRightIcon, FilePlusCornerIcon, MessageSquarePlusIcon } from "lucide-react";
+import {
+  ChevronRightIcon,
+  FilePlusCornerIcon,
+  MessageSquarePlusIcon,
+  Search,
+  SettingsIcon,
+} from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { type ComponentProps, useCallback } from "react";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Label } from "@/components/ui/label";
 import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInput,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
 } from "@/components/ui/sidebar";
 import { useChatId } from "@/hooks/use-chat";
-import { useNavMenu } from "@/hooks/use-nav";
+import { type NavNoteCategory, useNavigation } from "@/hooks/use-navigation";
+
+function NavSearch({ ...props }: ComponentProps<"form">) {
+  return (
+    <form {...props}>
+      <SidebarGroup className="py-0">
+        <SidebarGroupContent className="relative">
+          <Label htmlFor="search" className="sr-only">
+            Search
+          </Label>
+          <SidebarInput id="search" placeholder="搜索对话和笔记" className="pl-8" />
+          <Search className="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 opacity-50 select-none" />
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </form>
+  );
+}
 
 interface NavScopeItem {
   title: string;
@@ -80,8 +108,7 @@ function NavChatGroup({ group }: { group: NavScope[] }) {
   );
 }
 
-function NavNoteGroup() {
-  const notes = useNavMenu((state) => state.notes);
+function NavNoteGroup({ notes }: { notes: NavNoteCategory[] }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -133,4 +160,43 @@ function NavNoteGroup() {
   );
 }
 
-export { NavChatGroup, NavNoteGroup };
+const data = {
+  chats: [
+    {
+      title: "最近对话",
+      items: [{ title: "对话 1" }, { title: "对话 2" }],
+    },
+    {
+      title: "归档对话",
+      items: [{ title: "对话 3" }, { title: "对话 4" }],
+    },
+  ],
+};
+
+export function SidebarNavigation() {
+  const { notes } = useNavigation();
+
+  return (
+    <Sidebar collapsible="offcanvas" variant="inset">
+      <SidebarHeader>
+        <NavSearch />
+      </SidebarHeader>
+      <SidebarContent>
+        <NavChatGroup group={data.chats} />
+        <NavNoteGroup notes={notes} />
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <span>
+                <SettingsIcon />
+                <span>设置</span>
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
