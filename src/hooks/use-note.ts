@@ -110,3 +110,37 @@ export function useNote() {
     submitDraft,
   };
 }
+
+export function invokeAddNote(note: Note, success: () => void) {
+  invoke("add_note", { note }).then(
+    () => {
+      success();
+      toast.success("添加笔记成功", {
+        closeButton: true,
+      });
+    },
+    (error: unknown) => {
+      toast.error("添加笔记失败", {
+        description: safeErrorString(error),
+        closeButton: true,
+      });
+    },
+  );
+}
+
+export function invokeDeleteNote(id: string, success: () => void) {
+  invoke("delete_note_by_id", { id }).then(
+    () => {
+      success();
+      toast.success("删除笔记成功", {
+        closeButton: true,
+      });
+    },
+    (error: unknown) => {
+      toast.error("删除笔记失败", {
+        description: safeErrorString(error),
+        closeButton: true,
+      });
+    },
+  );
+}

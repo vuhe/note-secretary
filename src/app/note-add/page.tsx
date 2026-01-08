@@ -1,11 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { invoke } from "@tauri-apps/api/core";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -17,12 +16,12 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { type Note, NoteSchema } from "@/hooks/use-note";
-import { safeErrorString } from "@/lib/utils";
+import { invokeAddNote, type Note, NoteSchema } from "@/hooks/use-note";
+import useSafeRoute from "@/hooks/use-router";
 
 export default function Page() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useSafeRoute();
   const id = searchParams.get("id") ?? "";
 
   const { control, handleSubmit, reset } = useForm<Note>({
@@ -43,21 +42,9 @@ export default function Page() {
 
   const addNote = useCallback(
     (note: Note) => {
-      const value = { ...note, id };
-      invoke("add_note", { note: value }).then(
-        () => {
-          router.push(`/note?id=${id}`);
-          toast.success("添加笔记成功", {
-            closeButton: true,
-          });
-        },
-        (error: unknown) => {
-          toast.error("添加笔记失败", {
-            description: safeErrorString(error),
-            closeButton: true,
-          });
-        },
-      );
+      invokeAddNote({ ...note, id }, () => {
+        router.goToNote(id);
+      });
     },
     [router, id],
   );

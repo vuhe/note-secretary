@@ -1,8 +1,9 @@
 "use client";
 
 import { CircleSlash2Icon } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
 
+import AnimateDiv from "@/components/animation/animate-div";
 import { MarkdownDisplay } from "@/components/markdown/display";
 import { MarkdownSplitView } from "@/components/markdown/split";
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
@@ -19,27 +20,13 @@ export default function NoteContent({ content, editing, draft, setDraft }: NoteC
   return (
     <AnimatePresence mode="wait">
       {editing !== "display" ? (
-        <motion.div
-          className="flex size-full"
-          key="editor"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+        <AnimateDiv className="flex size-full" key="editor">
           <MarkdownSplitView content={content} draft={draft} setDraft={setDraft} />
-        </motion.div>
+        </AnimateDiv>
       ) : (
-        <motion.div
-          className="size-full overflow-y-auto relative"
-          key="display"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+        <AnimateDiv className="size-full overflow-y-auto relative" key="display">
           {content.trim().length === 0 ? (
-            <Empty>
+            <Empty className="h-full">
               <EmptyMedia variant="icon">
                 <CircleSlash2Icon />
               </EmptyMedia>
@@ -54,7 +41,7 @@ export default function NoteContent({ content, editing, draft, setDraft }: NoteC
               {content}
             </MarkdownDisplay>
           )}
-        </motion.div>
+        </AnimateDiv>
       )}
     </AnimatePresence>
   );

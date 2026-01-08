@@ -1,9 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AnimatePresence } from "motion/react";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
+import AnimateDiv from "@/components/animation/animate-div";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,7 +27,8 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { type Note, NoteSchema, type NoteStatus } from "@/hooks/use-note";
+import { invokeDeleteNote, type Note, NoteSchema, type NoteStatus } from "@/hooks/use-note";
+import useSafeRoute from "@/hooks/use-router";
 
 interface NoteMetadataProps {
   note: Note;
@@ -34,6 +37,8 @@ interface NoteMetadataProps {
 
 function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
   const [open, setOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(2);
+  const router = useSafeRoute();
   const { control, handleSubmit, reset } = useForm<Note>({
     resolver: zodResolver(NoteSchema),
     defaultValues: {
@@ -48,7 +53,9 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
   const onOpenChange = useCallback(
     (open: boolean) => {
       setOpen(open);
-      if (!open) reset();
+      if (open) return;
+      reset();
+      setDeleteConfirm(2);
     },
     [reset],
   );
@@ -57,9 +64,22 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
     (data: Note) => {
       setOpen(false);
       submitMetadata(data);
+      setDeleteConfirm(2);
     },
     [submitMetadata],
   );
+
+  const onDelete = useCallback(() => {
+    if (deleteConfirm > 0) {
+      setDeleteConfirm(deleteConfirm - 1);
+      return;
+    }
+    setOpen(false);
+    setDeleteConfirm(2);
+    invokeDeleteNote(note.id, () => {
+      router.goToNewChat();
+    });
+  }, [note, deleteConfirm, router]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -133,13 +153,40 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
               />
             </FieldGroup>
           </FieldSet>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">取消</Button>
-            </DialogClose>
-            <Button type="submit" form="note-metadata-form">
-              保存
-            </Button>
+          <DialogFooter className="select-none">
+            <AnimatePresence mode="wait">
+              {deleteConfirm === 2 ? (
+                <AnimateDiv
+                  key="delete-2"
+                  className="w-full flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"
+                >
+                  <Button variant="destructive" className="mr-auto" onClick={onDelete}>
+                    删除
+                  </Button>
+                  <DialogClose asChild>
+                    <Button variant="outline">取消</Button>
+                  </DialogClose>
+                  <Button type="submit" form="note-metadata-form">
+                    保存
+                  </Button>
+                </AnimateDiv>
+              ) : deleteConfirm === 1 ? (
+                <AnimateDiv key="delete-1" className="m-auto">
+                  <span className="mr-2">二次确认</span>
+                  <Button variant="destructive" onClick={onDelete}>
+                    删除
+                  </Button>
+                  <span className="ml-2">后不可恢复</span>
+                </AnimateDiv>
+              ) : (
+                <AnimateDiv key="delete-0" className="gap-1">
+                  <span className="mr-2">最终确认，执行</span>
+                  <Button variant="destructive" onClick={onDelete}>
+                    删除
+                  </Button>
+                </AnimateDiv>
+              )}
+            </AnimatePresence>
           </DialogFooter>
         </DialogContent>
       </form>

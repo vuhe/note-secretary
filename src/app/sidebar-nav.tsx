@@ -1,6 +1,5 @@
 "use client";
 
-import { createIdGenerator } from "ai";
 import {
   ChevronRightIcon,
   FilePlusCornerIcon,
@@ -8,8 +7,8 @@ import {
   Search,
   SettingsIcon,
 } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { type ComponentProps, useCallback } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import type { ComponentProps } from "react";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
@@ -27,8 +26,8 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
 } from "@/components/ui/sidebar";
-import { useChatId } from "@/hooks/use-chat";
 import { type NavNoteCategory, useNavigation } from "@/hooks/use-navigation";
+import useSafeRoute from "@/hooks/use-router";
 
 function NavSearch({ ...props }: ComponentProps<"form">) {
   return (
@@ -56,12 +55,7 @@ interface NavScope {
 }
 
 function NavChatGroup({ group }: { group: NavScope[] }) {
-  const router = useRouter();
-
-  const newChat = useCallback(() => {
-    useChatId.getState().newChat();
-    router.push("/chat");
-  }, [router]);
+  const { goToNewChat } = useSafeRoute();
 
   return (
     <SidebarGroup>
@@ -69,7 +63,7 @@ function NavChatGroup({ group }: { group: NavScope[] }) {
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild onClick={newChat}>
+            <SidebarMenuButton asChild onClick={goToNewChat}>
               <span className="select-none">
                 <MessageSquarePlusIcon />
                 <span>新建对话</span>
@@ -109,11 +103,8 @@ function NavChatGroup({ group }: { group: NavScope[] }) {
   );
 }
 
-/** note id 生成器 */
-const noteId = createIdGenerator({ prefix: "note" });
-
 function NavNoteGroup({ notes }: { notes: NavNoteCategory[] }) {
-  const router = useRouter();
+  const { goToNewNote, goToNote } = useSafeRoute();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currUrl = `${pathname}?${searchParams.toString()}`;
@@ -124,12 +115,7 @@ function NavNoteGroup({ notes }: { notes: NavNoteCategory[] }) {
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              onClick={() => {
-                router.push(`/note-add?id=${noteId()}`);
-              }}
-            >
+            <SidebarMenuButton asChild onClick={goToNewNote}>
               <span className="select-none">
                 <FilePlusCornerIcon />
                 <span>新建笔记</span>
@@ -152,7 +138,7 @@ function NavNoteGroup({ notes }: { notes: NavNoteCategory[] }) {
                         key={subItem.title}
                         isActive={currUrl === `/note?id=${subItem.id}`}
                         onClick={() => {
-                          router.push(`/note?id=${subItem.id}`);
+                          goToNote(subItem.id);
                         }}
                       >
                         {subItem.title}
