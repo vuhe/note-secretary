@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { invokeAddNote, type Note, NoteSchema } from "@/hooks/use-note";
 import useSafeRoute from "@/hooks/use-router";
+import { cn } from "@/lib/utils";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -51,7 +52,13 @@ export default function Page() {
 
   return (
     <SidebarInset key="note-add">
-      <header className="flex h-(--header-height) shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+      <header
+        className={cn(
+          "flex h-(--header-height) shrink-0 items-center gap-2",
+          "transition-[width,height] ease-linear",
+          "group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)",
+        )}
+      >
         <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
           <SidebarTrigger className="-ml-1 mr-2" />
           <div className="text-base font-medium select-none">新建笔记</div>

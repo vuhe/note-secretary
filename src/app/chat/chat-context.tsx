@@ -38,7 +38,7 @@ export default function ChatContext() {
   return (
     <PromptInputPopover>
       <PromptInputPopoverTrigger asChild>
-        <PromptInputButton className="h-8!" size="sm" variant="outline">
+        <PromptInputButton className="-ml-3" size="sm" variant="ghost">
           <span className="text-base font-medium">Documents</span>
         </PromptInputButton>
       </PromptInputPopoverTrigger>

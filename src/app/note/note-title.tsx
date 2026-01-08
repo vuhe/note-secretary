@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { usePlatform } from "@/hooks/use-mobile";
 import { invokeDeleteNote, type Note, NoteSchema, type NoteStatus } from "@/hooks/use-note";
 import useSafeRoute from "@/hooks/use-router";
 
@@ -200,8 +201,14 @@ interface NoteTitleProps {
 }
 
 export default function NoteTitle({ status, submitMetadata }: NoteTitleProps) {
+  const isDesktop = usePlatform((state) => state.isDesktop);
   if (status.status === "success") {
-    return <NoteMetadata note={status.value} submitMetadata={submitMetadata} />;
+    if (isDesktop) {
+      return <NoteMetadata note={status.value} submitMetadata={submitMetadata} />;
+    } else {
+      const title = `${status.value.category} - ${status.value.title}`;
+      return <div className="text-base font-medium select-none">{title}</div>;
+    }
   }
   return <div className="text-base text-muted-foreground font-medium select-none">加载中……</div>;
 }
