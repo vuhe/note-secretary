@@ -1,5 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
+"use client";
+
 import type { ComponentProps, ReactNode } from "react";
 
 import {

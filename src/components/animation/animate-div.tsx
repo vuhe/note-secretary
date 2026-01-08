@@ -1,3 +1,5 @@
+"use client";
+
 import { type HTMLMotionProps, motion } from "motion/react";
 
 export default function AnimateDiv(props: HTMLMotionProps<"div">) {
