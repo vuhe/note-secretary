@@ -1,5 +1,6 @@
 "use client";
 
+import { createIdGenerator } from "ai";
 import {
   ChevronRightIcon,
   FilePlusCornerIcon,
@@ -108,6 +109,9 @@ function NavChatGroup({ group }: { group: NavScope[] }) {
   );
 }
 
+/** note id 生成器 */
+const noteId = createIdGenerator({ prefix: "note" });
+
 function NavNoteGroup({ notes }: { notes: NavNoteCategory[] }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -120,7 +124,12 @@ function NavNoteGroup({ notes }: { notes: NavNoteCategory[] }) {
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton
+              asChild
+              onClick={() => {
+                router.push(`/note-add?id=${noteId()}`);
+              }}
+            >
               <span className="select-none">
                 <FilePlusCornerIcon />
                 <span>新建笔记</span>
