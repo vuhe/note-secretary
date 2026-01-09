@@ -9,7 +9,7 @@ import { safeErrorString } from "@/lib/utils";
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, "getState" | "getInitialState" | "subscribe">;
 type ReadonlyStore<T> = UseBoundStore<ReadonlyStoreApi<T>>;
 
-const SystemPromptPrefix = `LaTeX 公式的渲染仅支持符合以下约定的：
+const SystemPromptPrefix = `输出应遵循 GitHub Flavored Markdown，部分输出渲染需要符合以下约定的：
 
 1. **行内公式**：请使用两个美元符号 **$$...$$** 包裹，且公式前后不换行。  
    示例：这是质能方程 $$E = mc^{2}$$ 的应用。
@@ -22,7 +22,14 @@ const SystemPromptPrefix = `LaTeX 公式的渲染仅支持符合以下约定的�
 
 3. **流程图**：使用 Mermaid 代码块（\`\`\`mermaid ... \`\`\`）绘制。
 
-请在所有回答中严格遵守此格式，以确保公式正确显示。
+4. **Github Alert**：支持 NOTE、TIP、IMPORTANT、WARNING、CAUTION 提示框，
+   标题和正文需要隔一行，遵循 GitHub 规范，**仅支持顶层，不支持嵌套 Alert**。  
+   示例：  
+   > [!NOTE] title
+   > 
+   > Content
+
+请在所有回答中严格遵守此格式，以确保输出正确显示。
 
 ---
 

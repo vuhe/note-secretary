@@ -130,52 +130,45 @@
     /*noinspection CssNoGenericFontName*/
     font-family: var(--font-sans);
   }
-}
+  p[data-github-alert] {
+    @apply not-italic font-medium;
+    span[data-streamdown="strong"] {
+      @apply font-black!;
+    }
+  }
+  blockquote[data-github-alert="note"] {
+    @apply border-chart-5!;
 
-div.markdown-alert {
-  @apply relative w-full rounded-lg border px-4 py-3;
-}
+    & > p[data-github-alert] {
+      @apply text-chart-5;
+    }
+  }
+  blockquote[data-github-alert="tip"] {
+    @apply border-chart-4!;
 
-div.markdown-alert > p.markdown-alert-title {
-  @apply flex items-center font-mono text-sm;
-}
+    & > p[data-github-alert] {
+      @apply text-chart-4;
+    }
+  }
+  blockquote[data-github-alert="important"] {
+    @apply border-chart-3!;
 
-div.markdown-alert-note {
-  @apply border-chart-5;
-}
+    & > p[data-github-alert] {
+      @apply text-chart-3;
+    }
+  }
+  blockquote[data-github-alert="warning"] {
+    @apply border-chart-2!;
 
-p.markdown-alert-note {
-  @apply text-chart-5;
-}
+    & > p[data-github-alert] {
+      @apply text-chart-2;
+    }
+  }
+  blockquote[data-github-alert="caution"] {
+    @apply border-chart-1!;
 
-div.markdown-alert-tip {
-  @apply border-chart-4;
-}
-
-p.markdown-alert-tip {
-  @apply text-chart-4;
-}
-
-div.markdown-alert-important {
-  @apply border-chart-3;
-}
-
-p.markdown-alert-important {
-  @apply text-chart-3;
-}
-
-div.markdown-alert-warning {
-  @apply border-chart-2;
-}
-
-p.markdown-alert-warning {
-  @apply text-chart-2;
-}
-
-div.markdown-alert-caution {
-  @apply border-chart-1;
-}
-
-p.markdown-alert-caution {
-  @apply text-chart-1;
+    & > p[data-github-alert] {
+      @apply text-chart-1;
+    }
+  }
 }
