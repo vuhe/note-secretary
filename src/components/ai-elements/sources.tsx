@@ -1,8 +1,8 @@
 "use client";
 
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { BookIcon, ChevronDownIcon } from "lucide-react";
-import type { ComponentProps } from "react";
-
+import type { ComponentProps, MouseEvent } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
@@ -43,13 +43,28 @@ export const SourcesContent = ({ className, ...props }: SourcesContentProps) => 
 
 export type SourceProps = ComponentProps<"a">;
 
-export const Source = ({ href, title, children, ...props }: SourceProps) => (
-  <a className="flex items-center gap-2" href={href} rel="noreferrer" target="_blank" {...props}>
-    {children ?? (
-      <>
-        <BookIcon className="h-4 w-4" />
-        <span className="block font-medium">{title}</span>
-      </>
-    )}
-  </a>
-);
+export const Source = ({ href, title, children, ...props }: SourceProps) => {
+  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (href && !href.startsWith("#")) {
+      void openUrl(href);
+    }
+  };
+  return (
+    <a
+      className="flex items-center gap-2"
+      href={href}
+      rel="noreferrer"
+      target="_blank"
+      onClick={handleClick}
+      {...props}
+    >
+      {children ?? (
+        <>
+          <BookIcon className="h-4 w-4" />
+          <span className="block font-medium">{title}</span>
+        </>
+      )}
+    </a>
+  );
+};

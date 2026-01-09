@@ -60,7 +60,6 @@ export function useNote() {
   const submitMetadata = useCallback(
     (data: Note) => {
       if (status.status !== "success") return;
-      console.debug(data);
       invoke("modify_note_meta", { note: data }).then(
         () => {
           const newNote = { ...data, content: status.value.content };
