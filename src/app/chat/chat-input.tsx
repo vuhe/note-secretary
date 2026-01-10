@@ -74,7 +74,7 @@ export default function ChatInput({ status, sendMessage, stop }: ChatInputProps)
 
   return (
     <div className="px-2 pb-2">
-      <PromptInput globalDrop multiple onSubmit={handleSubmit}>
+      <PromptInput multiple onSubmit={handleSubmit}>
         <PromptInputAttachments>
           {(attachment) => <PromptInputAttachment data={attachment} />}
         </PromptInputAttachments>

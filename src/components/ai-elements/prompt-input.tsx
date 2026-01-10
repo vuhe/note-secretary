@@ -2,6 +2,9 @@
 
 "use client";
 
+import { basename } from "@tauri-apps/api/path";
+import { getCurrentWebview } from "@tauri-apps/api/webview";
+import { open } from "@tauri-apps/plugin-dialog";
 import { type ChatStatus, createIdGenerator, type FileUIPart } from "ai";
 import {
   CornerDownLeftIcon,
@@ -12,8 +15,8 @@ import {
   SquareIcon,
   XIcon,
 } from "lucide-react";
+import mime from "mime-types";
 import type {
-  ChangeEventHandler,
   ClipboardEventHandler,
   ComponentProps,
   FormEvent,
@@ -21,7 +24,6 @@ import type {
   HTMLAttributes,
   KeyboardEventHandler,
   ReactNode,
-  RefObject,
 } from "react";
 import {
   Children,
@@ -34,6 +36,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -65,19 +68,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, safeErrorString } from "@/lib/utils";
 
 const nanoid = createIdGenerator({ prefix: "file" });
 
-export type AttachmentFileUIPart = FileUIPart & { id: string };
+type AttachmentFileUIPart = FileUIPart & { id: string; ref: "file" | "tauri" | "ref" };
+
+interface AttachmentTauriItem {
+  path: string;
+  filename: string;
+}
+
+interface AttachmentRefItem {
+  refId: string;
+  filename: string;
+}
+
+type AttachmentAddItems =
+  | { type: "files"; files: File[] }
+  | { type: "tauri"; paths: AttachmentTauriItem[] }
+  | { type: "ref"; refs: AttachmentRefItem[] };
 
 export interface AttachmentsContext {
   files: AttachmentFileUIPart[];
-  add: (files: File[] | FileList) => void;
+  add: (files: AttachmentAddItems) => void;
   remove: (id: string) => void;
   clear: () => void;
-  openFileDialog: () => void;
-  fileInputRef: RefObject<HTMLInputElement | null>;
+  multipleSelect: boolean;
 }
 
 // ============================================================================
@@ -131,19 +148,9 @@ export function PromptInputAttachment({ data, className, ...props }: PromptInput
                 "rounded bg-background transition-opacity group-hover:opacity-0",
               )}
             >
-              {isImage ? (
-                <img
-                  alt={filename || "attachment"}
-                  className="size-5 object-cover"
-                  height={20}
-                  src={data.url}
-                  width={20}
-                />
-              ) : (
-                <div className="flex size-5 items-center justify-center text-muted-foreground">
-                  <PaperclipIcon className="size-3" />
-                </div>
-              )}
+              <div className="flex size-5 items-center justify-center text-muted-foreground">
+                {isImage ? <ImageIcon className="size-3" /> : <PaperclipIcon className="size-3" />}
+              </div>
             </div>
             <Button
               aria-label="Remove attachment"
@@ -229,12 +236,40 @@ export const PromptInputActionAddAttachments = ({
 }: PromptInputActionAddAttachmentsProps) => {
   const attachments = usePromptInputAttachments();
 
+  const onSelect = useCallback(async () => {
+    try {
+      const selected = await open({
+        title: "选择要上传的文件",
+        multiple: attachments.multipleSelect,
+        directory: false,
+      });
+
+      if (Array.isArray(selected)) {
+        const paths = await Promise.all(
+          selected.map(async (it: string): Promise<AttachmentTauriItem> => {
+            const filename = await basename(it);
+            return { path: it, filename };
+          }),
+        );
+        attachments.add({ type: "tauri", paths });
+      } else if (selected !== null) {
+        const filename = await basename(selected);
+        attachments.add({ type: "tauri", paths: [{ path: selected, filename }] });
+      }
+    } catch (error) {
+      toast.error("读取选择文件失败", {
+        description: safeErrorString(error),
+        closeButton: true,
+      });
+    }
+  }, [attachments]);
+
   return (
     <DropdownMenuItem
       {...props}
       onSelect={(e) => {
         e.preventDefault();
-        attachments.openFileDialog();
+        void onSelect();
       }}
     >
       <ImageIcon className="mr-2 size-4" /> {label}
@@ -250,14 +285,8 @@ export interface PromptInputMessage {
 export type PromptInputProps = Omit<HTMLAttributes<HTMLFormElement>, "onSubmit" | "onError"> & {
   accept?: string; // e.g., "image/*" or leave undefined for any
   multiple?: boolean;
-  // When true, accepts drops anywhere on a document. Default false (opt-in).
-  globalDrop?: boolean;
-  // Render a hidden input with the given name and keep it in sync for native form posts. Default false.
-  syncHiddenInput?: boolean;
   // Minimal constraints
   maxFiles?: number;
-  maxFileSize?: number; // bytes
-  onError?: (err: { code: "max_files" | "max_file_size" | "accept"; message: string }) => void;
   onSubmit: (message: PromptInputMessage, event: FormEvent<HTMLFormElement>) => Promise<void>;
 };
 
@@ -265,17 +294,12 @@ export const PromptInput = ({
   className,
   accept,
   multiple,
-  globalDrop,
-  syncHiddenInput,
   maxFiles,
-  maxFileSize,
-  onError,
   onSubmit,
   children,
   ...props
 }: PromptInputProps) => {
   // Refs
-  const inputRef = useRef<HTMLInputElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
 
   // ----- Local attachments (only used when no provider)
@@ -287,12 +311,8 @@ export const PromptInput = ({
   // eslint-disable-next-line react-hooks/refs
   filesRef.current = files;
 
-  const openFileDialogLocal = useCallback(() => {
-    inputRef.current?.click();
-  }, []);
-
   const matchesAccept = useCallback(
-    (f: File) => {
+    (type: string) => {
       if (!accept || accept.trim() === "") {
         return true;
       }
@@ -305,31 +325,64 @@ export const PromptInput = ({
       return patterns.some((pattern) => {
         if (pattern.endsWith("/*")) {
           const prefix = pattern.slice(0, -1); // e.g: image/* -> image/
-          return f.type.startsWith(prefix);
+          return type.startsWith(prefix);
         }
-        return f.type === pattern;
+        return type === pattern;
       });
     },
     [accept],
   );
 
-  const addLocal = useCallback(
-    (fileList: File[] | FileList) => {
-      const incoming = Array.from(fileList);
-      const accepted = incoming.filter((f) => matchesAccept(f));
-      if (incoming.length && accepted.length === 0) {
-        onError?.({
-          code: "accept",
-          message: "No files match the accepted types.",
-        });
-        return;
+  const add = useCallback(
+    (fileList: AttachmentAddItems) => {
+      let fileCount: number;
+      const accepted: AttachmentFileUIPart[] = [];
+
+      if (fileList.type === "files") {
+        fileCount = fileList.files.length;
+        for (const file of fileList.files) {
+          if (!matchesAccept(file.type)) continue;
+          accepted.push({
+            id: nanoid(),
+            ref: "file",
+            type: "file",
+            url: URL.createObjectURL(file),
+            mediaType: file.type,
+            filename: file.name,
+          });
+        }
+      } else if (fileList.type === "tauri") {
+        fileCount = fileList.paths.length;
+        for (const path of fileList.paths) {
+          const mimeType = mime.lookup(path.path);
+          if (typeof mimeType === "boolean") continue;
+          if (!matchesAccept(mimeType)) continue;
+          accepted.push({
+            id: nanoid(),
+            ref: "tauri",
+            type: "file",
+            url: path.path,
+            mediaType: mimeType,
+            filename: path.filename,
+          });
+        }
+      } else {
+        fileCount = fileList.refs.length;
+        for (const ref of fileList.refs) {
+          accepted.push({
+            id: nanoid(),
+            ref: "ref",
+            type: "file",
+            url: ref.refId,
+            mediaType: "text/plain",
+            filename: ref.filename,
+          });
+        }
       }
-      const withinSize = (f: File) => (maxFileSize ? f.size <= maxFileSize : true);
-      const sized = accepted.filter(withinSize);
-      if (accepted.length > 0 && sized.length === 0) {
-        onError?.({
-          code: "max_file_size",
-          message: "All files exceed the maximum size.",
+
+      if (fileCount && accepted.length === 0) {
+        toast.warning("没有文件符合可接受的类型", {
+          closeButton: true,
         });
         return;
       }
@@ -337,43 +390,32 @@ export const PromptInput = ({
       setItems((prev) => {
         const capacity =
           typeof maxFiles === "number" ? Math.max(0, maxFiles - prev.length) : undefined;
-        const capped = typeof capacity === "number" ? sized.slice(0, capacity) : sized;
-        if (typeof capacity === "number" && sized.length > capacity) {
-          onError?.({
-            code: "max_files",
-            message: "Too many files. Some were not added.",
+        const capped = typeof capacity === "number" ? accepted.slice(0, capacity) : accepted;
+        if (typeof capacity === "number" && accepted.length > capacity) {
+          toast.warning("文件过多，部分文件未添加", {
+            closeButton: true,
           });
         }
-        const next: AttachmentFileUIPart[] = [];
-        for (const file of capped) {
-          next.push({
-            id: nanoid(),
-            type: "file",
-            url: URL.createObjectURL(file),
-            mediaType: file.type,
-            filename: file.name,
-          });
-        }
-        return prev.concat(next);
+        return prev.concat(capped);
       });
     },
-    [matchesAccept, maxFiles, maxFileSize, onError],
+    [matchesAccept, maxFiles],
   );
 
-  const removeLocal = useCallback((id: string) => {
+  const remove = useCallback((id: string) => {
     setItems((prev) => {
       const found = prev.find((file) => file.id === id);
-      if (found?.url) {
+      if (found?.ref === "file" && found.url) {
         URL.revokeObjectURL(found.url);
       }
       return prev.filter((file) => file.id !== id);
     });
   }, []);
 
-  const clearLocal = useCallback(() => {
+  const clear = useCallback(() => {
     setItems((prev) => {
       for (const file of prev) {
-        if (file.url) {
+        if (file.ref === "file" && file.url) {
           URL.revokeObjectURL(file.url);
         }
       }
@@ -381,88 +423,36 @@ export const PromptInput = ({
     });
   }, []);
 
-  const add = addLocal;
-  const remove = removeLocal;
-  const clear = clearLocal;
-  const openFileDialog = openFileDialogLocal;
-
-  // Note: File input cannot be programmatically set for security reasons
-  // The syncHiddenInput prop is no longer functional
+  // Attach drop handlers on the nearest form and document
   useEffect(() => {
-    if (syncHiddenInput && inputRef.current && files.length === 0) {
-      inputRef.current.value = "";
-    }
-  }, [files, syncHiddenInput]);
-
-  // Attach drop handlers on the nearest form and document (opt-in)
-  useEffect(() => {
-    const form = formRef.current;
-    if (!form) return;
-    if (globalDrop) return; // when a global drop is on, let the document-level handler own drops
-
-    // noinspection DuplicatedCode
-    const onDragOver = (e: DragEvent) => {
-      if (e.dataTransfer?.types.includes("Files")) {
-        e.preventDefault();
+    const listening = getCurrentWebview().onDragDropEvent((event) => {
+      if (event.payload.type === "drop") {
+        Promise.all(
+          event.payload.paths.map(async (it): Promise<AttachmentTauriItem> => {
+            const filename = await basename(it);
+            return { path: it, filename };
+          }),
+        ).then(
+          (paths) => {
+            add({ type: "tauri", paths });
+          },
+          () => {},
+        );
       }
-    };
-    const onDrop = (e: DragEvent) => {
-      if (e.dataTransfer?.types.includes("Files")) {
-        e.preventDefault();
-      }
-      if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-        add(e.dataTransfer.files);
-      }
-    };
-    form.addEventListener("dragover", onDragOver);
-    form.addEventListener("drop", onDrop);
+    });
     return () => {
-      form.removeEventListener("dragover", onDragOver);
-      form.removeEventListener("drop", onDrop);
+      void listening.then((unlisten) => unlisten);
     };
-  }, [add, globalDrop]);
-
-  useEffect(() => {
-    if (!globalDrop) return;
-
-    // noinspection DuplicatedCode
-    const onDragOver = (e: DragEvent) => {
-      if (e.dataTransfer?.types.includes("Files")) {
-        e.preventDefault();
-      }
-    };
-    const onDrop = (e: DragEvent) => {
-      if (e.dataTransfer?.types.includes("Files")) {
-        e.preventDefault();
-      }
-      if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-        add(e.dataTransfer.files);
-      }
-    };
-    document.addEventListener("dragover", onDragOver);
-    document.addEventListener("drop", onDrop);
-    return () => {
-      document.removeEventListener("dragover", onDragOver);
-      document.removeEventListener("drop", onDrop);
-    };
-  }, [add, globalDrop]);
+  }, [add]);
 
   useEffect(
     () => () => {
       for (const f of filesRef.current) {
-        if (f.url) URL.revokeObjectURL(f.url);
+        if (f.ref === "file" && f.url) URL.revokeObjectURL(f.url);
       }
     },
     [],
   );
-
-  const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
-    if (event.currentTarget.files) {
-      add(event.currentTarget.files);
-    }
-    // Reset input value to allow selecting files that were previously removed
-    event.currentTarget.value = "";
-  };
 
   const convertBlobUrlToDataUrl = async (url: string): Promise<string | null> => {
     try {
@@ -490,10 +480,9 @@ export const PromptInput = ({
       add,
       remove,
       clear,
-      openFileDialog,
-      fileInputRef: inputRef,
+      multipleSelect: multiple ?? false,
     }),
-    [files, add, remove, clear, openFileDialog],
+    [files, add, remove, clear, multiple],
   );
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
@@ -539,26 +528,13 @@ export const PromptInput = ({
       });
   };
 
-  // Render with or without a local provider
-  const inner = (
-    <>
-      <input
-        accept={accept}
-        aria-label="Upload files"
-        className="hidden"
-        multiple={multiple}
-        onChange={handleChange}
-        ref={inputRef}
-        title="Upload files"
-        type="file"
-      />
+  return (
+    <LocalAttachmentsContext.Provider value={ctx}>
       <form className={cn("w-full", className)} onSubmit={handleSubmit} ref={formRef} {...props}>
         <InputGroup className="overflow-hidden">{children}</InputGroup>
       </form>
-    </>
+    </LocalAttachmentsContext.Provider>
   );
-
-  return <LocalAttachmentsContext.Provider value={ctx}>{inner}</LocalAttachmentsContext.Provider>;
 };
 
 export type PromptInputBodyProps = HTMLAttributes<HTMLDivElement>;
@@ -623,7 +599,7 @@ export const PromptInputTextarea = ({
 
     if (files.length > 0) {
       event.preventDefault();
-      attachments.add(files);
+      attachments.add({ type: "files", files });
     }
   };
 
