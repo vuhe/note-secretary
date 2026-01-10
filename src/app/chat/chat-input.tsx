@@ -17,7 +17,6 @@ import {
   PromptInputButton,
   PromptInputFooter,
   type PromptInputMessage,
-  PromptInputProvider,
   PromptInputSubmit,
   PromptInputTextarea,
   PromptInputTools,
@@ -44,7 +43,7 @@ export default function ChatInput({ status, sendMessage, stop }: ChatInputProps)
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
 
   const handleSubmit = useCallback(
-    (message: PromptInputMessage) => {
+    async (message: PromptInputMessage) => {
       if (status === "submitted" || status === "streaming") {
         void stop();
         return;
@@ -75,40 +74,38 @@ export default function ChatInput({ status, sendMessage, stop }: ChatInputProps)
 
   return (
     <div className="px-2 pb-2">
-      <PromptInputProvider>
-        <PromptInput globalDrop multiple onSubmit={handleSubmit}>
-          <PromptInputAttachments>
-            {(attachment) => <PromptInputAttachment data={attachment} />}
-          </PromptInputAttachments>
-          <PromptInputBody>
-            <PromptInputTextarea />
-          </PromptInputBody>
-          <PromptInputFooter>
-            <PromptInputTools>
-              <ChatPersona />
-              <PromptInputButton
-                onClick={() => {
-                  setUseWebSearch(!useWebSearch);
-                }}
-                variant={useWebSearch ? "default" : "ghost"}
-              >
-                <GlobeIcon size={16} />
-                <span className="hidden sm:flex">网络搜索</span>
-              </PromptInputButton>
-              <PromptInputActionMenu>
-                <PromptInputActionMenuTrigger>
-                  <PlusIcon size={16} />
-                  <span className="hidden sm:flex">添加附件</span>
-                </PromptInputActionMenuTrigger>
-                <PromptInputActionMenuContent>
-                  <PromptInputActionAddAttachments />
-                </PromptInputActionMenuContent>
-              </PromptInputActionMenu>
-            </PromptInputTools>
-            <PromptInputSubmit status={status} disabled={persona === undefined} />
-          </PromptInputFooter>
-        </PromptInput>
-      </PromptInputProvider>
+      <PromptInput globalDrop multiple onSubmit={handleSubmit}>
+        <PromptInputAttachments>
+          {(attachment) => <PromptInputAttachment data={attachment} />}
+        </PromptInputAttachments>
+        <PromptInputBody>
+          <PromptInputTextarea placeholder="询问任何问题" />
+        </PromptInputBody>
+        <PromptInputFooter>
+          <PromptInputTools>
+            <ChatPersona />
+            <PromptInputButton
+              onClick={() => {
+                setUseWebSearch(!useWebSearch);
+              }}
+              variant={useWebSearch ? "default" : "ghost"}
+            >
+              <GlobeIcon size={16} />
+              <span className="hidden sm:flex">网络搜索</span>
+            </PromptInputButton>
+            <PromptInputActionMenu>
+              <PromptInputActionMenuTrigger>
+                <PlusIcon size={16} />
+                <span className="hidden sm:flex">添加附件</span>
+              </PromptInputActionMenuTrigger>
+              <PromptInputActionMenuContent>
+                <PromptInputActionAddAttachments label="添加图片或文件" />
+              </PromptInputActionMenuContent>
+            </PromptInputActionMenu>
+          </PromptInputTools>
+          <PromptInputSubmit status={status} disabled={persona === undefined} />
+        </PromptInputFooter>
+      </PromptInput>
     </div>
   );
 }
