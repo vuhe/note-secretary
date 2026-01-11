@@ -2,6 +2,7 @@ mod command;
 mod database;
 mod emitter;
 mod error;
+mod files;
 mod uri_scheme;
 
 use command::AppCommand;

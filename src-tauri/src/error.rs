@@ -1,12 +1,11 @@
 use serde::ser::Serializer;
+use std::borrow::Cow;
 use std::sync::OnceLock;
 
 #[derive(Debug, thiserror::Error)]
 pub enum SetupError {
-  /// OnceLock set error.
   #[error("failed to set {0}")]
   OnceLock(&'static str),
-  /// Database error.
   #[error("database: {0}")]
   Database(#[from] sea_orm::DbErr),
 }
@@ -29,15 +28,18 @@ impl<T> OnceLockSetup<T> for OnceLock<T> {
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-  /// IO error.
   #[error("{0}")]
   IO(#[from] std::io::Error),
-  /// Database error.
   #[error("database: {0}")]
   Database(#[from] sea_orm::DbErr),
-  /// NotFound error.
+  #[error("handle zip: {0}")]
+  Zip(#[from] zip::result::ZipError),
+  #[error("handle json: {0}")]
+  Json(#[from] serde_json::Error),
   #[error("{0} not found")]
   NotFound(String),
+  #[error("{0}")]
+  Custom(Cow<'static, str>),
 }
 
 impl serde::Serialize for Error {
