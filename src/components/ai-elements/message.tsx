@@ -5,6 +5,7 @@ import { PaperclipIcon, XIcon } from "lucide-react";
 import type { ComponentProps, HTMLAttributes } from "react";
 import { memo } from "react";
 
+import { TauriImage } from "@/components/ai-elements/image";
 import { MarkdownDisplay, type MarkdownDisplayProps } from "@/components/markdown/display";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -101,11 +102,11 @@ export function MessageAttachment({ data, className, onRemove, ...props }: Messa
     <div className={cn("group relative size-24 overflow-hidden rounded-lg", className)} {...props}>
       {isImage ? (
         <>
-          <img
+          <TauriImage
             alt={filename || "attachment"}
             className="size-full object-cover"
             height={100}
-            src={data.url}
+            loader={{ type: "ref", value: data.url }}
             width={100}
           />
           {onRemove && (

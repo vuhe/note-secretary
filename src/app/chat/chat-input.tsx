@@ -62,11 +62,23 @@ export default function ChatInput({ status, sendMessage, stop }: ChatInputProps)
       const hasText = Boolean(message.text);
       const hasAttachments = Boolean(message.files.length);
 
+      // TODO: 需要将文件内容通过后台api保存到聊天记录中
+
+      const files = message.files.map((file): FileUIPart => {
+        return {
+          type: "file",
+          mediaType: file.mediaType,
+          filename: file.filename,
+          url: file.ref === "ref" ? file.url : file.id,
+          providerMetadata: file.providerMetadata,
+        };
+      });
+
       if (hasText) {
-        const files = hasAttachments ? message.files : undefined;
-        void sendMessage({ text: message.text, files }, options);
+        const attachmentFiles = hasAttachments ? files : undefined;
+        void sendMessage({ text: message.text, files: attachmentFiles }, options);
       } else if (hasAttachments) {
-        void sendMessage({ files: message.files }, options);
+        void sendMessage({ files }, options);
       }
     },
     [status, sendMessage, stop, persona],

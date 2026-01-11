@@ -4,6 +4,7 @@ import type { ChatStatus, FileUIPart, UIMessage } from "ai";
 import { CopyIcon, DownloadIcon, GitBranchPlusIcon } from "lucide-react";
 import mime from "mime-types";
 
+import { TauriImage } from "@/components/ai-elements/image";
 import {
   Message,
   MessageAction,
@@ -124,12 +125,13 @@ function AgentMessage({ message, status, last }: AgentMessageProps) {
             );
           case "file": {
             const mediaType = part.mediaType.startsWith("image/") && part.url ? "image" : "file";
+            const srcType = part.url.startsWith("file-") ? "ref" : "file";
             if (mediaType === "image") {
               return (
-                <img
+                <TauriImage
                   alt={part.filename}
                   className="h-auto max-w-full overflow-hidden rounded-md"
-                  src={part.url}
+                  loader={{ type: srcType, value: part.url }}
                 />
               );
             } else {

@@ -38,6 +38,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 
+import { TauriImage } from "@/components/ai-elements/image";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -177,11 +178,11 @@ export function PromptInputAttachment({ data, className, ...props }: PromptInput
         <div className="w-auto space-y-3">
           {isImage && (
             <div className="flex max-h-96 w-96 items-center justify-center overflow-hidden rounded-md border">
-              <img
+              <TauriImage
                 alt={filename || "attachment preview"}
                 className="max-h-full max-w-full object-contain"
                 height={384}
-                src={data.url}
+                loader={{ type: data.ref, value: data.url }}
                 width={448}
               />
             </div>

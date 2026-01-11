@@ -2,9 +2,11 @@ mod command;
 mod database;
 mod emitter;
 mod error;
+mod uri_scheme;
 
 use command::AppCommand;
 use tauri::Result;
+use uri_scheme::CustomUriScheme;
 
 #[cfg(target_os = "macos")]
 fn set_macos_title_bar(window: &tauri::WebviewWindow) -> Result<()> {
@@ -64,6 +66,7 @@ pub fn run() {
     .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_http::init())
     .plugin(tauri_plugin_opener::init())
+    .register_custom_uri()
     .register_handler()
     .setup(|app| {
       let win_builder = tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::default())
