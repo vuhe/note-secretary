@@ -37,6 +37,8 @@ pub enum Error {
   #[error("{0} not found")]
   NotFound(String),
   #[error("{0}")]
+  Tauri(#[from] tauri::Error),
+  #[error("{0}")]
   Custom(Cow<'static, str>),
 }
 
