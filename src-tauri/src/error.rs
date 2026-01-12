@@ -6,8 +6,6 @@ use std::sync::OnceLock;
 pub enum SetupError {
   #[error("failed to set {0}")]
   OnceLock(&'static str),
-  #[error("database: {0}")]
-  Database(#[from] sea_orm::DbErr),
 }
 
 impl From<SetupError> for tauri::Error {

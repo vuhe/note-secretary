@@ -6,7 +6,8 @@ mod files;
 mod uri_scheme;
 
 use command::AppCommand;
-use tauri::Result;
+use std::path::PathBuf;
+use tauri::{Manager, Result};
 use uri_scheme::CustomUriScheme;
 
 #[cfg(target_os = "macos")]
@@ -41,8 +42,10 @@ fn set_macos_title_bar(window: &tauri::WebviewWindow) -> Result<()> {
   Ok(())
 }
 
+struct AppDataPath(PathBuf);
+
 #[allow(unused_variables)]
-fn get_work_dir(app: &tauri::App) -> Result<std::path::PathBuf> {
+fn setup_work_dir(app: &tauri::App) -> Result<()> {
   let work_dir = {
     #[cfg(debug_assertions)]
     {
@@ -52,13 +55,13 @@ fn get_work_dir(app: &tauri::App) -> Result<std::path::PathBuf> {
     }
     #[cfg(not(debug_assertions))]
     {
-      use tauri::Manager;
       app.path().app_local_data_dir()?
     }
   };
 
   std::fs::create_dir_all(&work_dir)?;
-  Ok(work_dir)
+  app.manage(AppDataPath(work_dir));
+  Ok(())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -88,8 +91,8 @@ pub fn run() {
       emitter::setup_emitter(app)?;
 
       // 设置数据库和向量引擎
-      let work_dir = get_work_dir(&app)?;
-      database::setup_database(&work_dir)?;
+      setup_work_dir(app)?;
+      database::setup_database(app)?;
 
       Ok(())
     })

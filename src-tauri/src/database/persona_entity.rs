@@ -1,3 +1,4 @@
+use super::DatabaseHandler;
 use sea_orm::IntoActiveModel;
 use sea_orm::entity::prelude::*;
 use sea_orm::sea_query::OnConflict;
@@ -46,13 +47,13 @@ pub struct Model {
 
 impl ActiveModelBehavior for ActiveModel {}
 
-impl Model {
-  pub async fn all() -> crate::error::Result<Vec<Self>> {
-    Ok(Entity::find().all(super::DATABASE.get().unwrap()).await?)
+impl DatabaseHandler {
+  pub async fn find_all_personas(&self) -> crate::error::Result<Vec<Model>> {
+    Ok(Entity::find().all(&self.0).await?)
   }
 
-  pub async fn save(self) -> crate::error::Result<()> {
-    Entity::insert(self.into_active_model())
+  pub async fn save_persona(&self, model: Model) -> crate::error::Result<()> {
+    Entity::insert(model.into_active_model())
       .on_conflict(
         OnConflict::column(Column::Id)
           .update_columns([
@@ -71,7 +72,7 @@ impl Model {
           ])
           .to_owned(),
       )
-      .exec(super::DATABASE.get().unwrap())
+      .exec(&self.0)
       .await?;
     Ok(())
   }

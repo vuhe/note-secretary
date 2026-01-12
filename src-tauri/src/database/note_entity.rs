@@ -1,3 +1,4 @@
+use super::DatabaseHandler;
 use sea_orm::entity::prelude::*;
 use sea_orm::{IntoActiveModel, QuerySelect};
 use serde::{Deserialize, Serialize};
@@ -32,57 +33,51 @@ pub struct NoteSummary {
   pub title: String,
 }
 
-impl Model {
-  pub async fn all() -> crate::error::Result<Vec<NoteSummary>> {
+impl DatabaseHandler {
+  pub async fn find_all_notes(&self) -> crate::error::Result<Vec<NoteSummary>> {
     let result = Entity::find()
       .select_only()
       .column(Column::Id)
       .column(Column::Category)
       .column(Column::Title)
       .into_model::<NoteSummary>()
-      .all(super::DATABASE.get().unwrap())
+      .all(&self.0)
       .await?;
     Ok(result)
   }
 
-  pub async fn find_by_id(id: &str) -> crate::error::Result<Option<Model>> {
-    Ok(
-      Entity::find_by_id(id)
-        .one(super::DATABASE.get().unwrap())
-        .await?,
-    )
+  pub async fn find_note_by_id(&self, id: &str) -> crate::error::Result<Option<Model>> {
+    Ok(Entity::find_by_id(id).one(&self.0).await?)
   }
 
-  pub async fn insert(&self) -> crate::error::Result<()> {
-    let model = self.clone().into_active_model();
-    model.insert(super::DATABASE.get().unwrap()).await?;
+  pub async fn insert_note(&self, model: &Model) -> crate::error::Result<()> {
+    let model = model.clone().into_active_model();
+    model.insert(&self.0).await?;
     Ok(())
   }
 
-  pub async fn update_metadata(&self) -> crate::error::Result<()> {
+  pub async fn update_note_metadata(&self, model: &Model) -> crate::error::Result<()> {
     Entity::update_many()
-      .col_expr(Column::Category, Expr::value(self.category.clone()))
-      .col_expr(Column::Title, Expr::value(self.title.clone()))
-      .col_expr(Column::Summary, Expr::value(self.summary.clone()))
-      .filter(Column::Id.eq(self.id.clone()))
-      .exec(super::DATABASE.get().unwrap())
+      .col_expr(Column::Category, Expr::value(model.category.clone()))
+      .col_expr(Column::Title, Expr::value(model.title.clone()))
+      .col_expr(Column::Summary, Expr::value(model.summary.clone()))
+      .filter(Column::Id.eq(model.id.clone()))
+      .exec(&self.0)
       .await?;
     Ok(())
   }
 
-  pub async fn update_content<'a>(id: &'a str, content: &'a str) -> crate::error::Result<()> {
+  pub async fn update_note_content(&self, id: &str, content: &str) -> crate::error::Result<()> {
     Entity::update_many()
       .col_expr(Column::Content, Expr::value(content))
       .filter(Column::Id.eq(id))
-      .exec(super::DATABASE.get().unwrap())
+      .exec(&self.0)
       .await?;
     Ok(())
   }
 
-  pub async fn delete_by_id(id: &str) -> crate::error::Result<()> {
-    Entity::delete_by_id(id)
-      .exec(super::DATABASE.get().unwrap())
-      .await?;
+  pub async fn delete_note_by_id(&self, id: &str) -> crate::error::Result<()> {
+    Entity::delete_by_id(id).exec(&self.0).await?;
     Ok(())
   }
 }

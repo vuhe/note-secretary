@@ -35,9 +35,11 @@ async fn handle_image(req: Request<Vec<u8>>) -> Response<Vec<u8>> {
 
   match query_type {
     QueryImageType::File => {
-      let file_path = path.clone();
-      let result = spawn_blocking(move || std::fs::read(file_path)).await;
-      let file = match result {
+      let reader = {
+        let path = path.clone();
+        move || std::fs::read(path)
+      };
+      let file = match spawn_blocking(reader).await {
         Ok(it) => match it {
           Ok(file) => file,
           Err(error) => return error_to_bytes_resp(error),

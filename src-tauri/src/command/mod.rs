@@ -2,7 +2,10 @@ mod handle_env;
 mod handle_notes;
 mod handle_personas;
 
-use tauri::{Builder, Runtime};
+use crate::database::DatabaseHandler;
+use tauri::{Builder, Runtime, State};
+
+type Database<'a> = State<'a, DatabaseHandler>;
 
 pub trait AppCommand {
   fn register_handler(self) -> Self;
