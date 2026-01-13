@@ -36,9 +36,9 @@ impl ChatMessage {
       let archive = ZipArchive::new(file)?;
       return match archive.comment() == id.as_bytes() {
         true => Ok(None),
-        false => Err(Error::Custom(
-          format!("对话记录 {id} 冲突，尝试刷新获取最新对话或强制覆盖").into(),
-        )),
+        false => Err(Error::new(format!(
+          "对话记录 {id} 冲突，尝试刷新获取最新对话或强制覆盖"
+        ))),
       };
     }
 

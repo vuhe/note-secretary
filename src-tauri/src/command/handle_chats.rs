@@ -1,11 +1,13 @@
 use super::DataPath;
 use crate::error::Result;
 use crate::files::{ChatFile, ChatMessage};
-use serde_json::Value;
+use tauri::ipc::Response;
 
 #[tauri::command]
-pub async fn load_chat(path: DataPath<'_>, chat_id: String) -> Result<Vec<Value>> {
-  ChatMessage::read_all(&path.0, chat_id).await
+pub async fn load_chat(path: DataPath<'_>, chat_id: String) -> Result<Response> {
+  let messages = ChatMessage::read_all(&path.0, chat_id).await?;
+  let bytes = serde_json::to_vec(&messages)?;
+  Ok(Response::new(bytes))
 }
 
 #[tauri::command]

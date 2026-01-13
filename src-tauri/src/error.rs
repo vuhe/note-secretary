@@ -42,6 +42,12 @@ pub enum Error {
   Custom(Cow<'static, str>),
 }
 
+impl Error {
+  pub fn new(s: impl Into<Cow<'static, str>>) -> Self {
+    Self::Custom(s.into())
+  }
+}
+
 impl serde::Serialize for Error {
   fn serialize<S: Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
     serializer.serialize_str(self.to_string().as_ref())

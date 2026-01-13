@@ -1,8 +1,11 @@
 import { useChat } from "@ai-sdk/react";
+import { invoke } from "@tauri-apps/api/core";
 import { createIdGenerator, type LanguageModelUsage, type UIMessage } from "ai";
 import { useEffect } from "react";
+import { toast } from "sonner";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { Agent } from "@/lib/agent";
+import { safeErrorString } from "@/lib/utils";
 
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, "getState" | "getInitialState" | "subscribe">;
 type ReadonlyStore<T> = UseBoundStore<ReadonlyStoreApi<T>>;
@@ -45,14 +48,23 @@ export const useChatId: ReadonlyStore<ChatId> = create((set, get) => ({
     set({ requireLoading: false, loading: true });
 
     try {
-      // TODO: 需要从后台拉取历史记录并赋值
+      // 拿到的是 Uint8Array
+      const responseBytes = await invoke<Uint8Array>("load_chat", { chatId: capturedId });
+
+      // 使用 TextDecoder 高效转换并解析
+      const decoder = new TextDecoder();
+      const jsonString = decoder.decode(responseBytes);
+      const messages = JSON.parse(jsonString) as UIMessage[];
 
       // 防止在拉取对话期间点击其他对话造成状态不一致
       if (capturedId === get().id) {
-        setter([]);
+        setter(messages);
       }
     } catch (error) {
-      console.error(error);
+      toast.error("载入对话失败", {
+        description: safeErrorString(error),
+        closeButton: true,
+      });
     } finally {
       // 防止在拉取对话期间点击其他对话造成状态不一致
       if (capturedId === get().id) {
