@@ -49,3 +49,36 @@ impl serde::Serialize for Error {
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
+
+pub trait MapToCustomError<T, E> {
+  fn map_custom_err<O, R>(self, op: O) -> Result<T>
+  where
+    O: FnOnce(E) -> R,
+    R: Into<Cow<'static, str>>;
+}
+
+impl<T, E> MapToCustomError<T, E> for std::result::Result<T, E> {
+  fn map_custom_err<O, R>(self, op: O) -> Result<T>
+  where
+    O: FnOnce(E) -> R,
+    R: Into<Cow<'static, str>>,
+  {
+    match self {
+      Ok(t) => Ok(t),
+      Err(e) => Err(Error::Custom(op(e).into())),
+    }
+  }
+}
+
+impl<T> MapToCustomError<T, ()> for Option<T> {
+  fn map_custom_err<O, R>(self, op: O) -> Result<T>
+  where
+    O: FnOnce(()) -> R,
+    R: Into<Cow<'static, str>>,
+  {
+    match self {
+      Some(t) => Ok(t),
+      None => Err(Error::Custom(op(()).into())),
+    }
+  }
+}

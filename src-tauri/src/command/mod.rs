@@ -19,8 +19,8 @@ impl<R: Runtime> AppCommand for Builder<R> {
     self.invoke_handler(tauri::generate_handler![
       handle_env::env_is_mobile,
       // chats
+      handle_chats::load_chat,
       handle_chats::save_chat_message,
-      handle_chats::read_chat_messages,
       handle_chats::save_chat_file,
       // notes
       handle_notes::get_all_notes,

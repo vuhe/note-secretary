@@ -1,5 +1,6 @@
 use super::{PASSWORD, SAVE_DIR};
-use crate::error::{Error, Result};
+use crate::error::{Error, MapToCustomError, Result};
+use futures::stream::{self, StreamExt};
 use serde::Deserialize;
 use serde_json::{Value, from_reader, to_writer};
 use std::fs::File;
@@ -41,9 +42,9 @@ impl ChatMessage {
       };
     }
 
-    let Some(message) = self.message else {
-      return Err(Error::Custom(format!("对话记录 {id} 为 null").into()));
-    };
+    let message = self
+      .message
+      .map_custom_err(|_| format!("对话记录 {id} 为 null"))?;
 
     let file = File::create(&path)?;
     let mut writer = ZipWriter::new(file);
@@ -60,14 +61,6 @@ impl ChatMessage {
 
     Ok(Some(path))
   }
-
-  fn read_from_disk(self, path: PathBuf) -> Result<Value> {
-    let file = File::open(path)?;
-    let mut archive = ZipArchive::new(file)?;
-    let entry = archive.by_name_decrypt(MESSAGE_FILENAME, PASSWORD.as_bytes())?;
-
-    Ok(from_reader(entry)?)
-  }
 }
 
 impl ChatMessage {
@@ -79,11 +72,58 @@ impl ChatMessage {
     spawn_blocking(move || self.save_to_disk(path)).await?
   }
 
-  pub async fn read(self, app_data: &Path) -> Result<Value> {
-    let path = app_data
-      .join(SAVE_DIR)
-      .join(&self.chat_id)
-      .join(format!("{:04}.message", &self.index));
-    spawn_blocking(move || self.read_from_disk(path)).await?
+  pub async fn read_all(app_data: &Path, chat_id: String) -> Result<Vec<Value>> {
+    let dir = app_data.join(SAVE_DIR).join(chat_id);
+    let indexed_paths = spawn_blocking(move || {
+      let mut indexed_paths = Vec::new();
+
+      let entries = std::fs::read_dir(dir)?;
+      for entry in entries {
+        let path = entry?.path();
+        // 检查文件扩展名是否为 .message
+        if path.extension().filter(|it| *it == "message").is_none() {
+          continue;
+        }
+
+        // 提取文件名（不含扩展名）
+        let file_name = path
+          .file_stem()
+          .and_then(|it| it.to_str())
+          .map_custom_err(|_| format!("文件名解析失败: {}", path.display()))?;
+
+        // 解析数字
+        let index = file_name
+          .parse::<u16>()
+          .map_custom_err(|e| format!("文件名解析失败（{}）: {}", file_name, e))?;
+        indexed_paths.push((index, path));
+      }
+
+      // 按索引排序
+      indexed_paths.sort_by_key(|&(index, _)| index);
+
+      Ok::<Vec<(u16, PathBuf)>, Error>(indexed_paths)
+    })
+    .await??;
+
+    // 并发读取所有文件
+    let values: Vec<Value> = stream::iter(indexed_paths)
+      .map(|(_, path)| async move {
+        spawn_blocking(move || {
+          let file = File::open(path)?;
+          let mut archive = ZipArchive::new(file)?;
+          let entry = archive.by_name_decrypt(MESSAGE_FILENAME, PASSWORD.as_bytes())?;
+          let value: Value = from_reader(entry)?;
+          Ok(value)
+        })
+        .await?
+      })
+      // 限制同时最多只有 10 个任务在跑
+      .buffered(10)
+      .collect::<Vec<Result<Value>>>()
+      .await
+      .into_iter()
+      .collect::<Result<Vec<_>>>()?;
+
+    Ok(values)
   }
 }
