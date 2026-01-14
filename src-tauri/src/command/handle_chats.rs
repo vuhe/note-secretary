@@ -12,14 +12,18 @@ pub async fn load_chat(path: DataPath<'_>, chat_id: String) -> Result<Response> 
 
 #[tauri::command]
 pub async fn save_chat_message(path: DataPath<'_>, message: ChatMessage) -> Result<()> {
-  let _message_path = message.save(&path.0).await?;
-  // TODO: 需要通知 s3 同步
+  let message_path = message.save(&path.0).await?;
+
+  if let Some(_) = message_path {
+    // TODO: 需要通知 s3 同步
+  }
+
   Ok(())
 }
 
 #[tauri::command]
 pub async fn save_chat_file(path: DataPath<'_>, file: ChatFile) -> Result<()> {
-  let _file_path = file.save(&path.0, None).await?;
+  let _file_path = file.save(&path.0).await?;
   // TODO: 需要通知 s3 同步
   Ok(())
 }

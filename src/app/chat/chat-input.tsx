@@ -21,7 +21,9 @@ import {
   PromptInputTextarea,
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
+import { useChatId } from "@/hooks/use-chat";
 import { usePersona } from "@/hooks/use-persona";
+import { uploadFile } from "@/lib/agent";
 
 type SendMessageOptions =
   | {
@@ -62,7 +64,20 @@ export default function ChatInput({ status, sendMessage, stop }: ChatInputProps)
       const hasText = Boolean(message.text);
       const hasAttachments = Boolean(message.files.length);
 
-      // TODO: 需要将文件内容通过后台api保存到聊天记录中
+      await Promise.all(
+        message.files.map((file) =>
+          uploadFile({
+            chatId: useChatId.getState().id,
+            fileId: file.id,
+            mediaType: file.mediaType,
+            filename: file.filename,
+            data: {
+              kind: file.ref,
+              data: file.url,
+            },
+          }),
+        ),
+      );
 
       const files = message.files.map((file): FileUIPart => {
         return {

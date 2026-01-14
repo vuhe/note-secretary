@@ -34,6 +34,10 @@ pub enum Error {
   Zip(#[from] zip::result::ZipError),
   #[error("handle json: {0}")]
   Json(#[from] serde_json::Error),
+  #[error("handle data-url: {0}")]
+  DataUrl(#[from] data_url::DataUrlError),
+  #[error("decode data-url: {0}")]
+  DecodeDataUrl(#[from] data_url::forgiving_base64::InvalidBase64),
   #[error("{0} not found")]
   NotFound(String),
   #[error("{0}")]

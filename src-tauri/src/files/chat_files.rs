@@ -1,5 +1,6 @@
 use super::{PASSWORD, SAVE_DIR};
 use crate::error::Result;
+use data_url::DataUrl;
 use serde::{Deserialize, Serialize};
 use serde_json::to_writer;
 use std::fs::File;
@@ -15,7 +16,39 @@ const DEFAULT_FILENAME: &str = "data";
 const METADATA_FILENAME: &str = "meta.json";
 const SUMMARY_FILENAME: &str = "summary.txt";
 
+#[allow(dead_code)] // for RefId
 #[derive(Debug, Clone, Deserialize)]
+#[serde(tag = "kind", content = "data")]
+enum ChatFileData {
+  #[serde(rename = "file")]
+  DataUrl(String),
+  #[serde(rename = "tauri")]
+  Path(PathBuf),
+  #[serde(rename = "ref")]
+  RefId(String),
+}
+
+impl ChatFileData {
+  async fn to_data(&self) -> Result<Vec<u8>> {
+    match self {
+      Self::DataUrl(data_url) => {
+        let url = DataUrl::process(data_url)?;
+        let (body, _) = url.decode_to_vec()?;
+        Ok(body)
+      }
+      Self::Path(path) => {
+        let path = path.clone();
+        Ok(spawn_blocking(move || std::fs::read(path)).await??)
+      }
+      Self::RefId(_) => {
+        todo!("需要查表或者结合读库？")
+      }
+    }
+  }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ChatFile {
   /// 此消息所属的对话 id
   chat_id: String,
@@ -27,6 +60,8 @@ pub struct ChatFile {
   filename: Option<String>,
   /// 文件内容摘要
   summary: Option<String>,
+  /// 文件内容
+  data: Option<ChatFileData>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -111,12 +146,16 @@ impl ChatFile {
 }
 
 impl ChatFile {
-  pub async fn save(self, app_data: &Path, data: Option<Vec<u8>>) -> Result<PathBuf> {
+  pub async fn save(self, app_data: &Path) -> Result<PathBuf> {
     let path = app_data
       .join(SAVE_DIR)
       .join(&self.chat_id)
       .join(FILE_DIR_NAME)
       .join(&self.file_id);
+    let data = match self.data.as_ref() {
+      None => None,
+      Some(it) => Some(it.to_data().await?),
+    };
     spawn_blocking(move || self.save_to_disk(path, data)).await?
   }
 }

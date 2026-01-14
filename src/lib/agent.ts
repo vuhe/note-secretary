@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api/core";
 import {
   type ChatRequestOptions,
   type ChatTransport,
@@ -22,6 +23,22 @@ type SendMessageOption = {
 type ReconnectOption = {
   chatId: string;
 } & ChatRequestOptions;
+
+interface UploadChatFile {
+  chatId: string;
+  fileId: string;
+  mediaType: string;
+  filename?: string;
+  summary?: string;
+  data?: {
+    kind: "file" | "tauri" | "ref";
+    data: string;
+  };
+}
+
+export async function uploadFile(file: UploadChatFile) {
+  await invoke("save_chat_file", { file });
+}
 
 export class Agent implements ChatTransport<UIMessage> {
   async sendMessages(options: SendMessageOption): Promise<ReadableStream<UIMessageChunk>> {

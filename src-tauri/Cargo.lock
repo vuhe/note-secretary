@@ -2659,6 +2659,7 @@ name = "note_secretary"
 version = "0.1.0"
 dependencies = [
  "block2 0.6.1",
+ "data-url",
  "futures",
  "mime_guess",
  "objc2 0.6.3",
