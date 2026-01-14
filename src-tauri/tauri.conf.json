@@ -24,6 +24,13 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "resources": {
+      "../node_modules/@shikijs/langs/dist/*.mjs": "shiki-langs/",
+      "../node_modules/mermaid/dist/mermaid.esm.min.mjs": "mermaid/mermaid.esm.min.mjs",
+      "../node_modules/mermaid/dist/chunks/mermaid.esm.min/*.mjs": "mermaid-chunks/",
+      "../node_modules/katex/dist/katex.min.css": "katex/katex.min.css",
+      "../node_modules/katex/dist/fonts/*": "katex-fonts/"
+    }
   }
 }

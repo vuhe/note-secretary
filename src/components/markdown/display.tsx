@@ -2,6 +2,7 @@
 
 "use client";
 
+import { convertFileSrc } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import type { Root } from "hast";
 import { type ComponentProps, useEffect, useId } from "react";
@@ -130,6 +131,7 @@ export function MarkdownDisplay({
       controls={controlsWithDefault}
       className={cn(className, safeId(id))}
       {...props}
+      cdnUrl={convertFileSrc("", "streamdown")}
     />
   );
 }

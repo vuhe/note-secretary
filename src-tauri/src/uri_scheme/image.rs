@@ -1,32 +1,22 @@
+use super::{RespData, result_to_resp};
+use crate::error::{Error, Result};
 use mime_guess::{from_path as guess_mime, mime};
-use tauri::UriSchemeResponder;
-use tauri::async_runtime::spawn_blocking;
-use tauri::http::header::CONTENT_TYPE;
-use tauri::http::{Request, Response, StatusCode};
+use tauri::async_runtime::{spawn, spawn_blocking};
+use tauri::http::Request;
+use tauri::{Runtime, UriSchemeContext, UriSchemeResponder as Resp};
+
+type Ctx<'a, R> = UriSchemeContext<'a, R>;
 
 enum QueryImageType {
   File,
   Id,
 }
 
-fn error_to_bytes_resp(error: impl ToString) -> Response<Vec<u8>> {
-  Response::builder()
-    .status(StatusCode::INTERNAL_SERVER_ERROR)
-    .header(CONTENT_TYPE, mime::TEXT.to_string())
-    .body(error.to_string().as_bytes().to_vec())
-    .unwrap()
-}
-
-async fn handle_image(req: Request<Vec<u8>>) -> Response<Vec<u8>> {
+async fn handle_image(req: Request<Vec<u8>>) -> Result<RespData> {
   let query_type = match req.uri().query() {
     Some(it) if it == "type=file" => QueryImageType::File,
     Some(it) if it == "type=id" => QueryImageType::Id,
-    _ => {
-      return Response::builder()
-        .status(StatusCode::NOT_FOUND)
-        .body(vec![])
-        .unwrap();
-    }
+    _ => return Err(Error::NotFound("image".into())),
   };
 
   let path = percent_encoding::percent_decode(&req.uri().path().as_bytes())
@@ -39,18 +29,11 @@ async fn handle_image(req: Request<Vec<u8>>) -> Response<Vec<u8>> {
         let path = path.clone();
         move || std::fs::read(path)
       };
-      let file = match spawn_blocking(reader).await {
-        Ok(it) => match it {
-          Ok(file) => file,
-          Err(error) => return error_to_bytes_resp(error),
-        },
-        Err(error) => return error_to_bytes_resp(error),
-      };
-      let mime_type = guess_mime(&path).first_or(mime::IMAGE_JPEG).to_string();
-      Response::builder()
-        .header(CONTENT_TYPE, mime_type)
-        .body(file)
-        .unwrap()
+      let file = spawn_blocking(reader).await??;
+      let mime_type = guess_mime(&path)
+        .first_raw()
+        .unwrap_or(mime::IMAGE_JPEG.essence_str());
+      Ok((mime_type, file))
     }
     QueryImageType::Id => {
       todo!("需要确定文件保存后实现")
@@ -58,6 +41,9 @@ async fn handle_image(req: Request<Vec<u8>>) -> Response<Vec<u8>> {
   }
 }
 
-pub async fn handle_image_request(req: Request<Vec<u8>>, resp: UriSchemeResponder) {
-  resp.respond(handle_image(req).await)
+pub fn handler<R: Runtime>(_: Ctx<'_, R>, req: Request<Vec<u8>>, resp: Resp) {
+  spawn(async move {
+    let result = handle_image(req).await;
+    resp.respond(result_to_resp(result));
+  });
 }
