@@ -25,7 +25,7 @@ fn result_to_resp(result: Result<RespData>) -> Response<Vec<u8>> {
       .status(StatusCode::INTERNAL_SERVER_ERROR)
       .header(ACCESS_CONTROL_ALLOW_ORIGIN, "*")
       .header(CONTENT_TYPE, TEXT_PLAIN.essence_str())
-      .body(error.to_string().as_bytes().to_vec())
+      .body(error.to_string().into_bytes())
       .unwrap(),
   }
 }
