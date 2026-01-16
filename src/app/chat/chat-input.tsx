@@ -23,7 +23,7 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { useChatId } from "@/hooks/use-chat";
 import { usePersona } from "@/hooks/use-persona";
-import { uploadFile } from "@/lib/agent";
+import { type SendMessageOptionBody, uploadFile } from "@/lib/agent";
 
 type SendMessageOptions =
   | {
@@ -36,18 +36,19 @@ type SendMessageOptions =
 
 interface ChatInputProps {
   status: ChatStatus;
+  messageLens: number;
   sendMessage: (msg: SendMessageOptions, options?: ChatRequestOptions) => Promise<void>;
   stop: () => Promise<void>;
 }
 
-export default function ChatInput({ status, sendMessage, stop }: ChatInputProps) {
+export default function ChatInput({ status, messageLens, sendMessage, stop }: ChatInputProps) {
   const persona = usePersona((state) => state.selected);
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
 
   const handleSubmit = useCallback(
     async (message: PromptInputMessage) => {
       if (status === "submitted" || status === "streaming") {
-        void stop();
+        await stop();
         return;
       }
 
@@ -57,8 +58,13 @@ export default function ChatInput({ status, sendMessage, stop }: ChatInputProps)
       }
 
       if (!persona) return;
+      const chatId = useChatId.getState().id;
       const options: ChatRequestOptions = {
         metadata: persona,
+        body: {
+          chatId,
+          lastMessageLens: messageLens,
+        } as SendMessageOptionBody,
       };
 
       const hasText = Boolean(message.text);
@@ -67,7 +73,7 @@ export default function ChatInput({ status, sendMessage, stop }: ChatInputProps)
       await Promise.all(
         message.files.map((file) =>
           uploadFile({
-            chatId: useChatId.getState().id,
+            chatId,
             fileId: file.id,
             mediaType: file.mediaType,
             filename: file.filename,
@@ -84,19 +90,19 @@ export default function ChatInput({ status, sendMessage, stop }: ChatInputProps)
           type: "file",
           mediaType: file.mediaType,
           filename: file.filename,
-          url: file.ref === "ref" ? file.url : file.id,
+          url: file.id,
           providerMetadata: file.providerMetadata,
         };
       });
 
       if (hasText) {
         const attachmentFiles = hasAttachments ? files : undefined;
-        void sendMessage({ text: message.text, files: attachmentFiles }, options);
+        await sendMessage({ text: message.text, files: attachmentFiles }, options);
       } else if (hasAttachments) {
-        void sendMessage({ files }, options);
+        await sendMessage({ files }, options);
       }
     },
-    [status, sendMessage, stop, persona],
+    [status, messageLens, sendMessage, stop, persona],
   );
 
   return (

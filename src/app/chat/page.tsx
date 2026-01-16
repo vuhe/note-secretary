@@ -71,7 +71,12 @@ export default function Page() {
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
-        <ChatInput status={status} sendMessage={sendMessage} stop={stop} />
+        <ChatInput
+          status={status}
+          messageLens={messages.length}
+          sendMessage={sendMessage}
+          stop={stop}
+        />
       </div>
     </SidebarInset>
   );

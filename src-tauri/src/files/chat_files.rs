@@ -31,6 +31,7 @@ enum ChatFileData {
 impl ChatFileData {
   async fn to_data(&self) -> Result<Vec<u8>> {
     match self {
+      // FIXME: 此处不一定是 data url，也可能是一般的 url
       Self::DataUrl(data_url) => {
         let url = DataUrl::process(data_url)?;
         let (body, _) = url.decode_to_vec()?;

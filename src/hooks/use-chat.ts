@@ -22,7 +22,7 @@ interface ChatId {
 
   newChat: () => void;
   loadChat: (id: string) => void;
-  updateUsage: (usage: LanguageModelUsage) => void;
+  updateUsage: (id: string, usage: LanguageModelUsage) => void;
   loadMessages: (setter: MessagesSetter) => Promise<void>;
 }
 
@@ -39,7 +39,8 @@ export const useChatId: ReadonlyStore<ChatId> = create((set, get) => ({
     set({ id, requireLoading: true, loading: false, usage: undefined });
   },
 
-  updateUsage: (usage) => {
+  updateUsage: (id, usage) => {
+    if (id !== get().id) return;
     set({ usage });
   },
 

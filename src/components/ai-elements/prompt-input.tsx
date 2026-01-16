@@ -5,7 +5,7 @@
 import { basename } from "@tauri-apps/api/path";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { open } from "@tauri-apps/plugin-dialog";
-import { type ChatStatus, createIdGenerator, type FileUIPart } from "ai";
+import type { ChatStatus, FileUIPart } from "ai";
 import {
   CornerDownLeftIcon,
   ImageIcon,
@@ -69,9 +69,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn, safeErrorString } from "@/lib/utils";
+import { useChatId } from "@/hooks/use-chat";
+import { cn, fileIdGenerator, safeErrorString } from "@/lib/utils";
 
-const nanoid = createIdGenerator({ prefix: "file" });
+const nanoid = fileIdGenerator;
 
 type AttachmentFileUIPart = FileUIPart & { id: string; ref: "file" | "tauri" | "ref" };
 
@@ -488,6 +489,7 @@ export const PromptInput = ({
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
+    const chatId = useChatId.getState().id;
 
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -512,6 +514,11 @@ export const PromptInput = ({
       }),
     )
       .then((convertedFiles: AttachmentFileUIPart[]) => {
+        // 跨 await 后如果 chatId 不匹配清空返回不执行
+        if (useChatId.getState().id !== chatId) {
+          clear();
+          return;
+        }
         try {
           onSubmit({ text, files: convertedFiles }, event)
             .then(() => {

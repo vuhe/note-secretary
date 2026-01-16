@@ -12,6 +12,7 @@ use zip::{AesMode, CompressionMethod, ZipArchive, ZipWriter};
 const MESSAGE_FILENAME: &str = "message.json";
 
 #[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ChatMessage {
   /// 此消息所属的对话 id
   chat_id: String,
@@ -20,7 +21,7 @@ pub struct ChatMessage {
   /// 此信息的 id
   message_id: String,
   /// 此消息的内容
-  message: Option<Value>,
+  message: Value,
   /// 是否忽略已存在的文件进行覆盖
   force: Option<bool>,
 }
@@ -42,9 +43,7 @@ impl ChatMessage {
       };
     }
 
-    let message = self
-      .message
-      .map_custom_err(|_| format!("对话记录 {id} 为 null"))?;
+    let message = self.message;
 
     let file = File::create(&path)?;
     let mut writer = ZipWriter::new(file);
