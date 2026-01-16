@@ -3,7 +3,7 @@ use crate::error::Result;
 use data_url::DataUrl;
 use serde::{Deserialize, Serialize};
 use serde_json::to_writer;
-use std::fs::File;
+use std::fs::{File, create_dir_all};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use tauri::async_runtime::spawn_blocking;
@@ -82,6 +82,11 @@ impl ChatFile {
   }
 
   fn save_to_disk(self, path: PathBuf, data: Option<Vec<u8>>) -> Result<PathBuf> {
+    // 如果不存在父文件夹，创建文件夹
+    if let Some(parent) = path.parent() {
+      create_dir_all(parent)?;
+    }
+
     let temp_path = path.with_added_extension("tmp");
     let temp_file = File::create(&temp_path)?;
     let mut writer = ZipWriter::new(temp_file);

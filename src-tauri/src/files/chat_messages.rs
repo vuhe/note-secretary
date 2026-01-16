@@ -3,7 +3,7 @@ use crate::error::{Error, MapToCustomError, Result};
 use futures::stream::{self, StreamExt};
 use serde::Deserialize;
 use serde_json::{Value, from_reader, to_writer};
-use std::fs::File;
+use std::fs::{File, create_dir_all};
 use std::path::{Path, PathBuf};
 use tauri::async_runtime::spawn_blocking;
 use zip::write::SimpleFileOptions;
@@ -30,6 +30,11 @@ impl ChatMessage {
   fn save_to_disk(self, path: PathBuf) -> Result<Option<PathBuf>> {
     let need_check = !self.force.unwrap_or(false);
     let id = self.message_id;
+
+    // 如果不存在父文件夹，创建文件夹
+    if let Some(parent) = path.parent() {
+      create_dir_all(parent)?;
+    }
 
     // 如果存在这个记录且 id 匹配那么跳过，id 不匹配会报错
     if need_check && path.try_exists()? {
