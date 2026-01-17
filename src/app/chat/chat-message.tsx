@@ -1,6 +1,6 @@
 "use client";
 
-import type { ChatStatus, FileUIPart, UIMessage } from "ai";
+import type { ChatStatus, FileUIPart } from "ai";
 import { CopyIcon, DownloadIcon, GitBranchPlusIcon } from "lucide-react";
 import mime from "mime-types";
 
@@ -19,9 +19,10 @@ import { Source, Sources, SourcesContent, SourcesTrigger } from "@/components/ai
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
 import { Task, TaskContent, TaskItem, TaskTrigger } from "@/components/ai-elements/task";
 import { usePlatform } from "@/hooks/use-mobile";
+import type { DisplayMessage } from "@/lib/message";
 
 interface MessageProps {
-  message: UIMessage;
+  message: DisplayMessage;
 }
 
 interface AgentMessageProps extends MessageProps {

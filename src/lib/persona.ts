@@ -1,7 +1,8 @@
 import { createDeepSeek } from "@ai-sdk/deepseek";
 import { fetch } from "@tauri-apps/plugin-http";
-import type { LanguageModel } from "ai";
+import { convertToModelMessages, type LanguageModel, type ModelMessage } from "ai";
 import { z } from "zod";
+import type { DisplayMessage } from "@/lib/message";
 
 const SystemPromptPrefix = `输出应遵循 GitHub Flavored Markdown，部分输出渲染需要符合以下约定的：
 
@@ -34,7 +35,7 @@ export const PersonaSchema = z.object({
   provider: z.enum(["deepseek"], {
     error: (issue) => {
       const provider = typeof issue.input === "string" ? issue.input : "Unknown";
-      return `此版本不支持 ${provider} 提供商，请检查是否需要升级`;
+      return `此版本不支持 ${provider} 提供商`;
     },
   }),
   model: z.string().trim().min(1, "模型不能为空"),
@@ -88,7 +89,7 @@ export class Persona {
         break;
       }
       default:
-        throw new Error(`此版本不支持 ${this.provider} 提供商，请检查是否需要升级`);
+        throw new Error(`此版本不支持 ${this.provider} 提供商`);
     }
 
     this.maxOutputTokens = params.maxOutputTokens;
@@ -98,5 +99,44 @@ export class Persona {
     this.presencePenalty = params.presencePenalty;
     this.frequencyPenalty = params.frequencyPenalty;
     this.systemPrompt = `${SystemPromptPrefix}\n${params.systemPrompt}`;
+  }
+
+  async convertMessages(messages: DisplayMessage[]): Promise<ModelMessage[]> {
+    const inputMessages: DisplayMessage[] = [];
+    for (const message of messages) {
+      const parts = message.parts.map((it) => {
+        if (it.type === "file") {
+          // TODO: 从后台拿到数据
+          return {
+            type: "data-file",
+            data: {
+              type: "file",
+              data: "",
+              filename: it.filename,
+              mediaType: it.mediaType,
+              ...(it.providerMetadata != null ? { providerOptions: it.providerMetadata } : {}),
+            },
+          } as const;
+        }
+        return it;
+      });
+      inputMessages.push({
+        ...message,
+        parts,
+      });
+    }
+
+    return convertToModelMessages<DisplayMessage>(inputMessages, {
+      convertDataPart: (it) => {
+        switch (it.type) {
+          // 未来可能会增加定义
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          case "data-file":
+            return it.data;
+          default:
+            return undefined;
+        }
+      },
+    });
   }
 }

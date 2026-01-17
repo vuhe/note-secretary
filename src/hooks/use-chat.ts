@@ -1,16 +1,17 @@
 import { useChat } from "@ai-sdk/react";
 import { invoke } from "@tauri-apps/api/core";
-import { createIdGenerator, type LanguageModelUsage, type UIMessage } from "ai";
+import { createIdGenerator, type LanguageModelUsage } from "ai";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { Agent } from "@/lib/agent";
+import type { DisplayMessage } from "@/lib/message";
 import { safeErrorString } from "@/lib/utils";
 
 type ReadonlyStoreApi<T> = Pick<StoreApi<T>, "getState" | "getInitialState" | "subscribe">;
 type ReadonlyStore<T> = UseBoundStore<ReadonlyStoreApi<T>>;
 
-type MessagesSetter = (messages: UIMessage[]) => void;
+type MessagesSetter = (messages: DisplayMessage[]) => void;
 
 const idGenerator = createIdGenerator({ prefix: "chat" });
 
@@ -55,7 +56,7 @@ export const useChatId: ReadonlyStore<ChatId> = create((set, get) => ({
       // 使用 TextDecoder 高效转换并解析
       const decoder = new TextDecoder();
       const jsonString = decoder.decode(responseBytes);
-      const messages = JSON.parse(jsonString) as UIMessage[];
+      const messages = JSON.parse(jsonString) as DisplayMessage[];
 
       // 防止在拉取对话期间点击其他对话造成状态不一致
       if (capturedId === get().id) {

@@ -2,14 +2,13 @@ import { invoke } from "@tauri-apps/api/core";
 import {
   type ChatRequestOptions,
   type ChatTransport,
-  convertToModelMessages,
   createUIMessageStream,
   streamText,
-  type UIMessage,
   type UIMessageChunk,
 } from "ai";
 import { toast } from "sonner";
 import { useChatId } from "@/hooks/use-chat";
+import type { DisplayMessage } from "@/lib/message";
 import type { Persona } from "@/lib/persona";
 import { fileIdGenerator, safeErrorString } from "@/lib/utils";
 
@@ -17,7 +16,7 @@ type SendMessageOption = {
   trigger: "submit-message" | "regenerate-message";
   chatId: string;
   messageId: string | undefined;
-  messages: UIMessage[];
+  messages: DisplayMessage[];
   abortSignal: AbortSignal | undefined;
 } & ChatRequestOptions;
 
@@ -47,7 +46,7 @@ export async function uploadFile(file: UploadChatFile) {
 }
 
 /** 保存单条记录 */
-export async function saveMessage(chatId: string, message: UIMessage, index: number) {
+export async function saveMessage(chatId: string, message: DisplayMessage, index: number) {
   const messageId = message.id;
   for (const part of message.parts) {
     if (part.type === "file" && !part.url.startsWith("file-")) {
@@ -75,7 +74,7 @@ export async function saveMessage(chatId: string, message: UIMessage, index: num
   });
 }
 
-export class Agent implements ChatTransport<UIMessage> {
+export class Agent implements ChatTransport<DisplayMessage> {
   async sendMessages(options: SendMessageOption): Promise<ReadableStream<UIMessageChunk>> {
     const params = options.body as SendMessageOptionBody;
     if (useChatId.getState().id !== params.chatId) throw Error("chat change!");
@@ -90,7 +89,7 @@ export class Agent implements ChatTransport<UIMessage> {
       presencePenalty: model.presencePenalty,
       frequencyPenalty: model.frequencyPenalty,
       system: model.systemPrompt,
-      messages: await convertToModelMessages(options.messages),
+      messages: await model.convertMessages(options.messages),
       abortSignal: options.abortSignal,
       onStepFinish: (it) => {
         useChatId.getState().updateUsage(params.chatId, it.usage);
