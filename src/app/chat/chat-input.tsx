@@ -75,8 +75,6 @@ export default function ChatInput({ status, messageLens, sendMessage, stop }: Ch
           uploadFile({
             chatId,
             fileId: file.id,
-            mediaType: file.mediaType,
-            filename: file.filename,
             data: {
               kind: file.ref,
               data: file.url,

@@ -2,8 +2,7 @@ use super::{PASSWORD, SAVE_DIR};
 use crate::database::DatabaseHandler;
 use crate::error::{MapToCustomError, Result};
 use data_url::DataUrl;
-use serde::{Deserialize, Serialize};
-use serde_json::to_writer;
+use serde::Deserialize;
 use std::fs::{File, create_dir_all};
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -15,7 +14,6 @@ use zip::{AesMode, CompressionMethod, ZipArchive, ZipWriter};
 const FILE_DIR_NAME: &str = "files";
 
 const DEFAULT_FILENAME: &str = "data";
-const METADATA_FILENAME: &str = "meta.json";
 const SUMMARY_FILENAME: &str = "summary.txt";
 
 #[derive(Debug, Clone, Deserialize)]
@@ -63,32 +61,13 @@ pub struct ChatFile {
   chat_id: String,
   /// 此消息所属的文件 id
   file_id: String,
-  /// 文件的 mime type
-  media_type: String,
-  /// 文件名
-  filename: Option<String>,
   /// 文件内容摘要
   summary: Option<String>,
   /// 文件内容
   data: Option<ChatFileData>,
 }
 
-#[derive(Debug, Clone, Serialize)]
-struct ChatFileMeta {
-  media_type: String,
-  filename: String,
-}
-
 impl ChatFile {
-  fn filename(&self) -> Option<String> {
-    if let Some(name) = self.filename.clone() {
-      return Some(name);
-    }
-    mime_guess::get_mime_extensions_str(&self.media_type)
-      .and_then(|it| it.first())
-      .map(|it| format!("data.{it}"))
-  }
-
   fn save_to_disk(self, path: PathBuf, data: Option<Vec<u8>>) -> Result<PathBuf> {
     // 如果不存在父文件夹，创建文件夹
     if let Some(parent) = path.parent() {
@@ -99,8 +78,8 @@ impl ChatFile {
     let temp_file = File::create(&temp_path)?;
     let mut writer = ZipWriter::new(temp_file);
 
-    // [meta, summary, data] flag
-    let mut flag = [true, true, true];
+    let mut need_copy_summary = true;
+    let mut need_copy_data = true;
 
     if path.try_exists()? {
       let file = File::open(&path)?;
@@ -109,9 +88,8 @@ impl ChatFile {
         let entry = archive.by_index_raw(i)?;
 
         match entry.name() {
-          METADATA_FILENAME => flag[0] = false,
-          SUMMARY_FILENAME => flag[1] = false,
-          DEFAULT_FILENAME => flag[2] = false,
+          SUMMARY_FILENAME => need_copy_summary = false,
+          DEFAULT_FILENAME => need_copy_data = false,
           _ => continue,
         }
 
@@ -123,30 +101,14 @@ impl ChatFile {
       .compression_method(CompressionMethod::Stored)
       .with_aes_encryption(AesMode::Aes256, PASSWORD);
 
-    // meta 没有复制
-    if flag[0] {
-      let filename = self.filename();
-      let meta = ChatFileMeta {
-        media_type: self.media_type,
-        filename: filename.unwrap_or("unknown".into()),
-      };
-
-      writer.start_file(METADATA_FILENAME, options)?;
-      to_writer(&mut writer, &meta)?;
-    }
-
     // summary 没有复制
-    if flag[1]
-      && let Some(summary) = self.summary.as_deref()
-    {
+    if need_copy_summary && let Some(summary) = self.summary.as_deref() {
       writer.start_file(SUMMARY_FILENAME, options)?;
       writer.write_all(summary.as_bytes())?;
     }
 
     // data 没有复制
-    if flag[2]
-      && let Some(data) = data
-    {
+    if need_copy_data && let Some(data) = data {
       writer.start_file(DEFAULT_FILENAME, options)?;
       writer.write_all(&data)?;
     }

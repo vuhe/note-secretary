@@ -32,8 +32,6 @@ export interface SendMessageOptionBody {
 interface UploadChatFile {
   chatId: string;
   fileId: string;
-  mediaType: string;
-  filename?: string;
   summary?: string;
   data?: {
     kind: "file" | "tauri" | "ref";
@@ -54,8 +52,6 @@ export async function saveMessage(chatId: string, message: DisplayMessage, index
       await uploadFile({
         chatId: chatId,
         fileId: id,
-        mediaType: part.mediaType,
-        filename: part.filename,
         data: {
           kind: "file",
           data: part.url,
