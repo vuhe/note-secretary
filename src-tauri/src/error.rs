@@ -28,6 +28,7 @@ impl<T> OnceLockSetup<T> for OnceLock<T> {
 pub enum Error {
   #[error("{0}")]
   IO(#[from] std::io::Error),
+
   #[error("database: {0}")]
   Database(#[from] sea_orm::DbErr),
   #[error("handle zip: {0}")]
@@ -38,10 +39,14 @@ pub enum Error {
   DataUrl(#[from] data_url::DataUrlError),
   #[error("decode data-url: {0}")]
   DecodeDataUrl(#[from] data_url::forgiving_base64::InvalidBase64),
-  #[error("{0} not found")]
-  NotFound(String),
+  #[error("request: {0}")]
+  Request(#[from] tauri_plugin_http::reqwest::Error),
+
   #[error("{0}")]
   Tauri(#[from] tauri::Error),
+
+  #[error("{0} not found")]
+  NotFound(String),
   #[error("{0}")]
   Custom(Cow<'static, str>),
 }

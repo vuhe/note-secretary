@@ -1,5 +1,6 @@
 use super::{PASSWORD, SAVE_DIR};
-use crate::error::Result;
+use crate::database::DatabaseHandler;
+use crate::error::{MapToCustomError, Result};
 use data_url::DataUrl;
 use serde::{Deserialize, Serialize};
 use serde_json::to_writer;
@@ -7,6 +8,7 @@ use std::fs::{File, create_dir_all};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use tauri::async_runtime::spawn_blocking;
+use tauri_plugin_http::reqwest;
 use zip::write::SimpleFileOptions;
 use zip::{AesMode, CompressionMethod, ZipArchive, ZipWriter};
 
@@ -16,12 +18,11 @@ const DEFAULT_FILENAME: &str = "data";
 const METADATA_FILENAME: &str = "meta.json";
 const SUMMARY_FILENAME: &str = "summary.txt";
 
-#[allow(dead_code)] // for RefId
 #[derive(Debug, Clone, Deserialize)]
 #[serde(tag = "kind", content = "data")]
 enum ChatFileData {
   #[serde(rename = "file")]
-  DataUrl(String),
+  Url(String),
   #[serde(rename = "tauri")]
   Path(PathBuf),
   #[serde(rename = "ref")]
@@ -29,20 +30,27 @@ enum ChatFileData {
 }
 
 impl ChatFileData {
-  async fn to_data(&self) -> Result<Vec<u8>> {
+  async fn to_data(&self, database: &DatabaseHandler) -> Result<Vec<u8>> {
     match self {
-      // FIXME: 此处不一定是 data url，也可能是一般的 url
-      Self::DataUrl(data_url) => {
-        let url = DataUrl::process(data_url)?;
-        let (body, _) = url.decode_to_vec()?;
-        Ok(body)
+      Self::Url(url) => {
+        if url.starts_with("data:") {
+          let url = DataUrl::process(url)?;
+          let (body, _) = url.decode_to_vec()?;
+          return Ok(body);
+        }
+        let res = reqwest::get(url).await?;
+        Ok(res.bytes().await?.into())
       }
       Self::Path(path) => {
         let path = path.clone();
         Ok(spawn_blocking(move || std::fs::read(path)).await??)
       }
-      Self::RefId(_) => {
-        todo!("需要查表或者结合读库？")
+      Self::RefId(note_id) => {
+        let note = database
+          .find_note_by_id(note_id)
+          .await?
+          .map_custom_err(|_| format!("找不到对应笔记（{note_id}）"))?;
+        Ok(note.content.into_bytes())
       }
     }
   }
@@ -152,7 +160,7 @@ impl ChatFile {
 }
 
 impl ChatFile {
-  pub async fn save(self, app_data: &Path) -> Result<PathBuf> {
+  pub async fn save(self, app_data: &Path, database: &DatabaseHandler) -> Result<PathBuf> {
     let path = app_data
       .join(SAVE_DIR)
       .join(&self.chat_id)
@@ -160,7 +168,7 @@ impl ChatFile {
       .join(&self.file_id);
     let data = match self.data.as_ref() {
       None => None,
-      Some(it) => Some(it.to_data().await?),
+      Some(it) => Some(it.to_data(database).await?),
     };
     spawn_blocking(move || self.save_to_disk(path, data)).await?
   }

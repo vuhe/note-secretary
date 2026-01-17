@@ -1,7 +1,10 @@
 use super::DataPath;
+use crate::AppDataPath;
+use crate::database::DatabaseHandler;
 use crate::error::Result;
 use crate::files::{ChatFile, ChatMessage};
 use tauri::ipc::Response;
+use tauri::{AppHandle, Manager, Runtime};
 
 #[tauri::command]
 pub async fn load_chat(path: DataPath<'_>, chat_id: String) -> Result<Response> {
@@ -22,8 +25,12 @@ pub async fn save_chat_message(path: DataPath<'_>, message: ChatMessage) -> Resu
 }
 
 #[tauri::command]
-pub async fn save_chat_file(path: DataPath<'_>, file: ChatFile) -> Result<()> {
-  let _file_path = file.save(&path.0).await?;
+pub async fn save_chat_file<R: Runtime>(app: AppHandle<R>, file: ChatFile) -> Result<()> {
+  let path = app.state::<AppDataPath>();
+  let database = app.state::<DatabaseHandler>();
+  let _file_path = file.save(&path.0, &database).await?;
+
   // TODO: 需要通知 s3 同步
+
   Ok(())
 }
