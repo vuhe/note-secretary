@@ -22,10 +22,10 @@ pub struct Model {
   #[serde(skip_serializing_if = "Option::is_none")]
   pub base_url: Option<String>,
   /// 参数 maxTokens
-  pub max_tokens: i32,
+  pub max_tokens: u32,
   /// 参数 maxOutputTokens
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub max_output_tokens: Option<i32>,
+  pub max_output_tokens: Option<u32>,
   /// 参数 temperature
   #[serde(skip_serializing_if = "Option::is_none")]
   pub temperature: Option<f64>,
@@ -34,7 +34,7 @@ pub struct Model {
   pub top_p: Option<f64>,
   /// 参数 topK
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub top_k: Option<i32>,
+  pub top_k: Option<u16>,
   /// 参数 presencePenalty
   #[serde(skip_serializing_if = "Option::is_none")]
   pub presence_penalty: Option<f64>,

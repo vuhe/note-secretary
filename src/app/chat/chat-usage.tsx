@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
 import { useChatId } from "@/hooks/use-chat";
-import { type Persona, usePersona } from "@/hooks/use-persona";
+import { usePersona } from "@/hooks/use-persona";
+import type { Persona } from "@/lib/persona";
 import { cn } from "@/lib/utils";
 
 interface ChatUsageProps {

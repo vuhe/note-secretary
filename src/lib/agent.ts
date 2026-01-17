@@ -10,7 +10,7 @@ import {
 } from "ai";
 import { toast } from "sonner";
 import { useChatId } from "@/hooks/use-chat";
-import type { Persona } from "@/hooks/use-persona";
+import type { Persona } from "@/lib/persona";
 import { fileIdGenerator, safeErrorString } from "@/lib/utils";
 
 type SendMessageOption = {
