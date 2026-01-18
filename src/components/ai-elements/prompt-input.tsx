@@ -513,9 +513,8 @@ export const PromptInput = ({
       }),
     )
       .then((convertedFiles: AttachmentFileUIPart[]) => {
-        // 跨 await 后如果 chatId 不匹配清空返回不执行
+        // 跨 await 后如果 chatId 不匹配返回不执行
         if (useChatId.getState().id !== chatId) {
-          clear();
           return;
         }
         onSubmit({ text, files: convertedFiles }, event)
@@ -553,11 +552,7 @@ export const PromptInputBody = ({ className, ...props }: PromptInputBodyProps) =
 
 export type PromptInputTextareaProps = ComponentProps<typeof InputGroupTextarea>;
 
-export const PromptInputTextarea = ({
-  onChange,
-  className,
-  ...props
-}: PromptInputTextareaProps) => {
+export const PromptInputTextarea = ({ className, ...props }: PromptInputTextareaProps) => {
   const attachments = usePromptInputAttachments();
   const [isComposing, setIsComposing] = useState(false);
 
@@ -623,7 +618,6 @@ export const PromptInputTextarea = ({
       }}
       onKeyDown={handleKeyDown}
       onPaste={handlePaste}
-      onChange={onChange}
       {...props}
     />
   );

@@ -2,7 +2,7 @@
 
 import type { ChatRequestOptions, ChatStatus, FileUIPart } from "ai";
 import { GlobeIcon, PlusIcon } from "lucide-react";
-import { useCallback, useState } from "react";
+import { type ChangeEvent, useCallback, useState } from "react";
 
 import ChatPersona from "@/app/chat/chat-persona";
 import {
@@ -44,7 +44,12 @@ interface ChatInputProps {
 
 export default function ChatInput({ status, sendMessage, stop, clearError }: ChatInputProps) {
   const persona = usePersona((state) => state.selected);
+  const [text, setText] = useState("");
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
+
+  const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
+    setText(event.target.value);
+  }, []);
 
   const handleSubmit = useCallback(
     async (message: PromptInputMessage) => {
@@ -112,6 +117,7 @@ export default function ChatInput({ status, sendMessage, stop, clearError }: Cha
       } else if (hasAttachments) {
         void sendMessage({ files }, options);
       }
+      setText("");
     },
     [status, sendMessage, stop, clearError, persona],
   );
@@ -123,7 +129,7 @@ export default function ChatInput({ status, sendMessage, stop, clearError }: Cha
           {(attachment) => <PromptInputAttachment data={attachment} />}
         </PromptInputAttachments>
         <PromptInputBody>
-          <PromptInputTextarea placeholder="询问任何问题" />
+          <PromptInputTextarea placeholder="询问任何问题" value={text} onChange={handleChange} />
         </PromptInputBody>
         <PromptInputFooter>
           <PromptInputTools>
