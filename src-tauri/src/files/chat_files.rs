@@ -91,7 +91,7 @@ impl ChatFile {
       .join(SAVE_DIR)
       .join(&self.chat_id)
       .join(FILE_DIR_NAME)
-      .join(&self.file_id);
+      .join(format!("{}.file", &self.file_id));
     let data = self
       .data
       .as_ref()
@@ -105,7 +105,7 @@ impl ChatFile {
       .join(SAVE_DIR)
       .join(&self.chat_id)
       .join(FILE_DIR_NAME)
-      .join(&self.file_id);
+      .join(format!("{}.file", &self.file_id));
     spawn_blocking(move || {
       let file = File::open(path)?;
       let mut archive = ZipArchive::new(file)?;

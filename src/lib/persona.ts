@@ -71,9 +71,9 @@ export class Persona {
 
   constructor(params: PersonaParams) {
     this.id = params.id;
-
     this.maxTokens = params.maxTokens;
     this.provider = params.provider;
+
     const modelId = params.model;
     const apiKey = params.apiKey;
     const baseURL = params.baseUrl;

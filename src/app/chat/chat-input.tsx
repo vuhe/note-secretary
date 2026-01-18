@@ -50,12 +50,12 @@ export default function ChatInput({ status, messageLens, sendMessage, stop }: Ch
     async (message: PromptInputMessage) => {
       if (status === "submitted" || status === "streaming") {
         await stop();
-        return;
+        throw "防止清理未提交的数据";
       }
 
       if (status === "error") {
         // TODO: 错误清空处理
-        return;
+        throw "防止清理未提交的数据";
       }
 
       if (!persona) return;
@@ -96,9 +96,9 @@ export default function ChatInput({ status, messageLens, sendMessage, stop }: Ch
 
       if (hasText) {
         const attachmentFiles = hasAttachments ? files : undefined;
-        await sendMessage({ text: message.text, files: attachmentFiles }, options);
+        void sendMessage({ text: message.text, files: attachmentFiles }, options);
       } else if (hasAttachments) {
-        await sendMessage({ files }, options);
+        void sendMessage({ files }, options);
       }
     },
     [status, messageLens, sendMessage, stop, persona],
