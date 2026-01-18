@@ -61,16 +61,16 @@ export default function ChatInput({ status, sendMessage, stop, clearError }: Cha
       if (!persona) return;
       const chatId = useChatId.getState().id;
       const checkpoint = useChatId.getState().checkpoint;
-      const options: ChatRequestOptions = {
-        metadata: persona,
-        body: {
-          chatId,
-          lastMessageLens: checkpoint,
-        } as SendMessageOptionBody,
-      };
 
-      const hasText = Boolean(message.text);
-      const hasAttachments = Boolean(message.files.length);
+      // 是否上传了不支持的文件筛查
+      for (const file of message.files) {
+        // TODO: 需要检查是否有文档总结 AI
+        const isSupportedFile = (await persona.supportedFile(file.mediaType)) || false;
+        if (!isSupportedFile) {
+          const filename = file.filename ? ` '${file.filename}' ` : "";
+          throw new Error(`模型不支持${filename}文件且无法转换为文本摘要`);
+        }
+      }
 
       await Promise.all(
         message.files.map((file) =>
@@ -94,6 +94,17 @@ export default function ChatInput({ status, sendMessage, stop, clearError }: Cha
           providerMetadata: file.providerMetadata,
         };
       });
+
+      const options: ChatRequestOptions = {
+        metadata: persona,
+        body: {
+          chatId,
+          lastMessageLens: checkpoint,
+        } as SendMessageOptionBody,
+      };
+
+      const hasText = Boolean(message.text);
+      const hasAttachments = Boolean(message.files.length);
 
       if (hasText) {
         const attachmentFiles = hasAttachments ? files : undefined;

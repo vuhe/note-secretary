@@ -69,6 +69,8 @@ export class Persona {
 
   readonly systemPrompt: string;
 
+  private supportedUrls: PromiseLike<Record<string, RegExp[]>> | Record<string, RegExp[]>;
+
   constructor(params: PersonaParams) {
     this.id = params.id;
     this.maxTokens = params.maxTokens;
@@ -80,16 +82,20 @@ export class Persona {
 
     switch (this.provider) {
       case "deepseek": {
-        this.model = createDeepSeek({
+        const model = createDeepSeek({
           apiKey: apiKey,
           baseURL: baseURL,
           fetch: fetch,
         }).languageModel(modelId);
+        this.model = model;
+        this.supportedUrls = model.supportedUrls;
         break;
       }
       default:
         throw new Error(`此版本不支持 ${this.provider} 提供商`);
     }
+
+    // TODO: 如果要全部执行文件优化则应该设置 supportedUrls 为 {}
 
     this.maxOutputTokens = params.maxOutputTokens;
     this.temperature = params.temperature;
@@ -98,5 +104,25 @@ export class Persona {
     this.presencePenalty = params.presencePenalty;
     this.frequencyPenalty = params.frequencyPenalty;
     this.systemPrompt = `${SystemPromptPrefix}\n${params.systemPrompt}`;
+  }
+
+  async supportedFile(mimeType: string) {
+    const supported = await this.supportedUrls;
+    this.supportedUrls = supported; // 避免多次重复调用昂贵的计算函数
+    const supportedTypes = Object.keys(supported);
+    for (const pattern of supportedTypes) {
+      if (pattern.trim() === "" || pattern === "*/*") {
+        return true;
+      }
+      if (pattern.endsWith("/*")) {
+        const prefix = pattern.slice(0, -1); // e.g: image/* -> image/
+        if (mimeType.startsWith(prefix)) {
+          return true;
+        }
+      } else if (mimeType === pattern) {
+        return true;
+      }
+    }
+    return false;
   }
 }

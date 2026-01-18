@@ -34,6 +34,7 @@ export class Agent implements ChatTransport<DisplayMessage> {
     if (useChatId.getState().id !== params.chatId) throw Error("chat change!");
 
     const model = options.metadata as Persona;
+
     const result = streamText({
       model: model.model,
       maxOutputTokens: model.maxOutputTokens,
@@ -49,6 +50,7 @@ export class Agent implements ChatTransport<DisplayMessage> {
         useChatId.getState().updateUsage(params.chatId, it.usage);
       },
     });
+
     return createUIMessageStream({
       async execute({ writer }) {
         // TODO: 将 writer 传入 tool 用于在工具中发送状态

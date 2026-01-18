@@ -518,17 +518,18 @@ export const PromptInput = ({
           clear();
           return;
         }
-        try {
-          onSubmit({ text, files: convertedFiles }, event)
-            .then(() => {
-              clear();
-            })
-            .catch(() => {
-              // Don't clear on error - user may want to retry
+        onSubmit({ text, files: convertedFiles }, event)
+          .then(() => {
+            clear();
+          })
+          .catch((error: unknown) => {
+            // Don't clear on error - user may want to retry
+            if (error === "防止清理未提交的数据") return;
+            toast.warning("发送失败", {
+              description: safeErrorString(error),
+              closeButton: true,
             });
-        } catch {
-          // Don't clear on error - user may want to retry
-        }
+          });
       })
       .catch(() => {
         // Don't clear on error - user may want to retry
