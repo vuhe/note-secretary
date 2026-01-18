@@ -25,6 +25,12 @@ pub async fn save_chat_message(path: DataPath<'_>, message: ChatMessage) -> Resu
 }
 
 #[tauri::command]
+pub async fn read_chat_file(path: DataPath<'_>, file: ChatFile) -> Result<Response> {
+  let bytes = file.read(&path.0).await?;
+  Ok(Response::new(bytes))
+}
+
+#[tauri::command]
 pub async fn save_chat_file<R: Runtime>(app: AppHandle<R>, file: ChatFile) -> Result<()> {
   let path = app.state::<AppDataPath>();
   let database = app.state::<DatabaseHandler>();

@@ -1,4 +1,3 @@
-import { invoke } from "@tauri-apps/api/core";
 import {
   type ChatRequestOptions,
   type ChatTransport,
@@ -8,9 +7,9 @@ import {
 } from "ai";
 import { toast } from "sonner";
 import { useChatId } from "@/hooks/use-chat";
-import type { DisplayMessage } from "@/lib/message";
+import { convertMessages, type DisplayMessage, saveMessage } from "@/lib/message";
 import type { Persona } from "@/lib/persona";
-import { fileIdGenerator, safeErrorString } from "@/lib/utils";
+import { safeErrorString } from "@/lib/utils";
 
 type SendMessageOption = {
   trigger: "submit-message" | "regenerate-message";
@@ -29,47 +28,6 @@ export interface SendMessageOptionBody {
   lastMessageLens: number;
 }
 
-interface TauriChatFile {
-  chatId: string;
-  fileId: string;
-  summary?: string;
-  data?: {
-    kind: "file" | "tauri" | "ref";
-    data: string;
-  };
-}
-
-export async function uploadFile(file: TauriChatFile) {
-  await invoke("save_chat_file", { file });
-}
-
-/** 保存单条记录 */
-export async function saveMessage(chatId: string, message: DisplayMessage, index: number) {
-  const messageId = message.id;
-  for (const part of message.parts) {
-    if (part.type === "file" && !part.url.startsWith("file-")) {
-      const id = fileIdGenerator();
-      await uploadFile({
-        chatId: chatId,
-        fileId: id,
-        data: {
-          kind: "file",
-          data: part.url,
-        },
-      });
-      part.url = id;
-    }
-  }
-  await invoke("save_chat_message", {
-    message: {
-      chatId,
-      index,
-      messageId,
-      message,
-    },
-  });
-}
-
 export class Agent implements ChatTransport<DisplayMessage> {
   async sendMessages(options: SendMessageOption): Promise<ReadableStream<UIMessageChunk>> {
     const params = options.body as SendMessageOptionBody;
@@ -85,7 +43,7 @@ export class Agent implements ChatTransport<DisplayMessage> {
       presencePenalty: model.presencePenalty,
       frequencyPenalty: model.frequencyPenalty,
       system: model.systemPrompt,
-      messages: await model.convertMessages(options.messages),
+      messages: await convertMessages(params.chatId, options.messages),
       abortSignal: options.abortSignal,
       onStepFinish: (it) => {
         useChatId.getState().updateUsage(params.chatId, it.usage);

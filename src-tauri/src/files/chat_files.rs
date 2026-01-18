@@ -4,7 +4,7 @@ use crate::error::{MapToCustomError, Result};
 use data_url::DataUrl;
 use serde::Deserialize;
 use std::fs::{File, create_dir_all};
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use tauri::async_runtime::spawn_blocking;
 use tauri_plugin_http::reqwest;
@@ -12,9 +12,7 @@ use zip::write::SimpleFileOptions;
 use zip::{AesMode, CompressionMethod, ZipArchive, ZipWriter};
 
 const FILE_DIR_NAME: &str = "files";
-
 const DEFAULT_FILENAME: &str = "data";
-const SUMMARY_FILENAME: &str = "summary.txt";
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(tag = "kind", content = "data")]
@@ -61,61 +59,27 @@ pub struct ChatFile {
   chat_id: String,
   /// 此消息所属的文件 id
   file_id: String,
-  /// 文件内容摘要
-  summary: Option<String>,
   /// 文件内容
   data: Option<ChatFileData>,
 }
 
 impl ChatFile {
-  fn save_to_disk(self, path: PathBuf, data: Option<Vec<u8>>) -> Result<PathBuf> {
+  fn save_to_disk(self, path: PathBuf, data: Vec<u8>) -> Result<PathBuf> {
     // 如果不存在父文件夹，创建文件夹
     if let Some(parent) = path.parent() {
       create_dir_all(parent)?;
     }
 
-    let temp_path = path.with_added_extension("tmp");
-    let temp_file = File::create(&temp_path)?;
-    let mut writer = ZipWriter::new(temp_file);
-
-    let mut need_copy_summary = true;
-    let mut need_copy_data = true;
-
-    if path.try_exists()? {
-      let file = File::open(&path)?;
-      let mut archive = ZipArchive::new(file)?;
-      for i in 0..archive.len() {
-        let entry = archive.by_index_raw(i)?;
-
-        match entry.name() {
-          SUMMARY_FILENAME => need_copy_summary = false,
-          DEFAULT_FILENAME => need_copy_data = false,
-          _ => continue,
-        }
-
-        writer.raw_copy_file(entry)?; // 高效拷贝，不涉及解密再加密
-      }
-    }
+    let file = File::create(&path)?;
+    let mut writer = ZipWriter::new(file);
 
     let options = SimpleFileOptions::default()
       .compression_method(CompressionMethod::Stored)
       .with_aes_encryption(AesMode::Aes256, PASSWORD);
 
-    // summary 没有复制
-    if need_copy_summary && let Some(summary) = self.summary.as_deref() {
-      writer.start_file(SUMMARY_FILENAME, options)?;
-      writer.write_all(summary.as_bytes())?;
-    }
-
-    // data 没有复制
-    if need_copy_data && let Some(data) = data {
-      writer.start_file(DEFAULT_FILENAME, options)?;
-      writer.write_all(&data)?;
-    }
-
+    writer.start_file(DEFAULT_FILENAME, options)?;
+    writer.write_all(&data)?;
     writer.finish()?;
-
-    std::fs::rename(temp_path, &path)?;
 
     Ok(path)
   }
@@ -128,10 +92,28 @@ impl ChatFile {
       .join(&self.chat_id)
       .join(FILE_DIR_NAME)
       .join(&self.file_id);
-    let data = match self.data.as_ref() {
-      None => None,
-      Some(it) => Some(it.to_data(database).await?),
-    };
+    let data = self
+      .data
+      .as_ref()
+      .map_custom_err(|_| "保存文件时数据缺失")?;
+    let data = data.to_data(database).await?;
     spawn_blocking(move || self.save_to_disk(path, data)).await?
+  }
+
+  pub async fn read(self, app_data: &Path) -> Result<Vec<u8>> {
+    let path = app_data
+      .join(SAVE_DIR)
+      .join(&self.chat_id)
+      .join(FILE_DIR_NAME)
+      .join(&self.file_id);
+    spawn_blocking(move || {
+      let file = File::open(path)?;
+      let mut archive = ZipArchive::new(file)?;
+      let mut entry = archive.by_name_decrypt(DEFAULT_FILENAME, PASSWORD.as_bytes())?;
+      let mut buffer = Vec::with_capacity(entry.size() as usize);
+      entry.read_to_end(&mut buffer)?;
+      Ok(buffer)
+    })
+    .await?
   }
 }

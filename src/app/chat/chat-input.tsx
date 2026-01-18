@@ -23,7 +23,8 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { useChatId } from "@/hooks/use-chat";
 import { usePersona } from "@/hooks/use-persona";
-import { type SendMessageOptionBody, uploadFile } from "@/lib/agent";
+import type { SendMessageOptionBody } from "@/lib/agent";
+import { saveChatFile } from "@/lib/message";
 
 type SendMessageOptions =
   | {
@@ -72,7 +73,7 @@ export default function ChatInput({ status, messageLens, sendMessage, stop }: Ch
 
       await Promise.all(
         message.files.map((file) =>
-          uploadFile({
+          saveChatFile({
             chatId,
             fileId: file.id,
             data: {

@@ -20,10 +20,13 @@ interface ChatId {
   requireLoading: boolean;
   loading: boolean;
   usage?: LanguageModelUsage;
+  /** 文件的总结缓存 */
+  files: Readonly<Record<string, string>>;
 
   newChat: () => void;
   loadChat: (id: string) => void;
   updateUsage: (id: string, usage: LanguageModelUsage) => void;
+  updateFile: (id: string, key: string, value: string) => void;
   loadMessages: (setter: MessagesSetter) => Promise<void>;
 }
 
@@ -31,18 +34,25 @@ export const useChatId: ReadonlyStore<ChatId> = create((set, get) => ({
   id: idGenerator(),
   requireLoading: false,
   loading: false,
+  files: {},
 
   newChat: () => {
-    set({ id: idGenerator(), requireLoading: false, loading: false, usage: undefined });
+    const id = idGenerator();
+    set({ id, requireLoading: false, loading: false, usage: undefined, files: {} });
   },
 
   loadChat: (id) => {
-    set({ id, requireLoading: true, loading: false, usage: undefined });
+    set({ id, requireLoading: true, loading: false, usage: undefined, files: {} });
   },
 
   updateUsage: (id, usage) => {
     if (id !== get().id) return;
     set({ usage });
+  },
+
+  updateFile: (id, key, value) => {
+    if (id !== get().id) return;
+    set((status) => ({ files: { ...status.files, [key]: value } }));
   },
 
   loadMessages: async (setter) => {

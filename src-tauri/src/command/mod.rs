@@ -21,6 +21,7 @@ impl<R: Runtime> AppCommand for Builder<R> {
       // chats
       handle_chats::load_chat,
       handle_chats::save_chat_message,
+      handle_chats::read_chat_file,
       handle_chats::save_chat_file,
       // notes
       handle_notes::get_all_notes,
