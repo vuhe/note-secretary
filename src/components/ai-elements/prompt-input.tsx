@@ -434,12 +434,11 @@ export const PromptInput = ({
             const filename = await basename(it);
             return { path: it, filename };
           }),
-        ).then(
-          (paths) => {
+        )
+          .then((paths) => {
             add({ type: "tauri", paths });
-          },
-          () => {},
-        );
+          })
+          .catch(() => {});
       }
     });
     return () => {

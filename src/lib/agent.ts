@@ -29,7 +29,7 @@ export interface SendMessageOptionBody {
   lastMessageLens: number;
 }
 
-interface UploadChatFile {
+interface TauriChatFile {
   chatId: string;
   fileId: string;
   summary?: string;
@@ -39,7 +39,7 @@ interface UploadChatFile {
   };
 }
 
-export async function uploadFile(file: UploadChatFile) {
+export async function uploadFile(file: TauriChatFile) {
   await invoke("save_chat_file", { file });
 }
 

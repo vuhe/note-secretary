@@ -26,8 +26,8 @@ export function useNavigation() {
   const [notes, setNotes] = useState<NavNoteCategory[]>([]);
 
   const getAllNotes = useCallback(() => {
-    invoke<NavNote[]>("get_all_notes").then(
-      (noteList) => {
+    invoke<NavNote[]>("get_all_notes")
+      .then((noteList) => {
         const categoryMap: Record<string, NavNote[]> = {};
         noteList.forEach((note) => {
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -49,14 +49,13 @@ export function useNavigation() {
             };
           });
         setNotes(sortedCategories);
-      },
-      (error: unknown) => {
+      })
+      .catch((error: unknown) => {
         toast.error("获取笔记列表失败", {
           description: safeErrorString(error),
           closeButton: true,
         });
-      },
-    );
+      });
   }, []);
 
   // 初始化调用一次准备数据
