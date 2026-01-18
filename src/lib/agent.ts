@@ -61,6 +61,7 @@ export class Agent implements ChatTransport<DisplayMessage> {
         for (let i = params.lastMessageLens; i < messages.length; i++) {
           try {
             await saveMessage(params.chatId, messages[i], i);
+            useChatId.getState().updateCheckpoint(params.chatId, i + 1);
           } catch (error) {
             success = false;
             if (useChatId.getState().id === params.chatId) {

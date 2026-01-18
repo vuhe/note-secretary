@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2Icon, MessageSquareIcon } from "lucide-react";
+import { AlertCircleIcon, Loader2Icon, MessageSquareIcon } from "lucide-react";
 
 import ChatContext from "@/app/chat/chat-context";
 import ChatInput from "@/app/chat/chat-input";
@@ -12,13 +12,14 @@ import {
   ConversationEmptyState,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { useChatContext, useChatId } from "@/hooks/use-chat";
-import { cn } from "@/lib/utils";
+import { cn, safeErrorString } from "@/lib/utils";
 
 export default function Page() {
   const loading = useChatId((state) => state.loading);
-  const { messages, sendMessage, status, stop } = useChatContext();
+  const { messages, sendMessage, status, stop, error, clearError } = useChatContext();
 
   return (
     <SidebarInset key="chat">
@@ -68,15 +69,17 @@ export default function Page() {
                 <span className="text-sm">正在加载……</span>
               </div>
             )}
+            {status === "error" && (
+              <Alert variant="destructive">
+                <AlertCircleIcon />
+                <AlertTitle>遇到错误！</AlertTitle>
+                {error && <AlertDescription>{safeErrorString(error)}</AlertDescription>}
+              </Alert>
+            )}
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
-        <ChatInput
-          status={status}
-          messageLens={messages.length}
-          sendMessage={sendMessage}
-          stop={stop}
-        />
+        <ChatInput status={status} sendMessage={sendMessage} stop={stop} clearError={clearError} />
       </div>
     </SidebarInset>
   );

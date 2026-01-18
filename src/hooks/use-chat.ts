@@ -22,11 +22,13 @@ interface ChatId {
   usage?: LanguageModelUsage;
   /** 文件的总结缓存 */
   files: Readonly<Record<string, string>>;
+  checkpoint: number;
 
   newChat: () => void;
   loadChat: (id: string) => void;
   updateUsage: (id: string, usage: LanguageModelUsage) => void;
   updateFile: (id: string, key: string, value: string) => void;
+  updateCheckpoint: (id: string, value: number) => void;
   loadMessages: (setter: MessagesSetter) => Promise<void>;
 }
 
@@ -35,14 +37,15 @@ export const useChatId: ReadonlyStore<ChatId> = create((set, get) => ({
   requireLoading: false,
   loading: false,
   files: {},
+  checkpoint: 0,
 
   newChat: () => {
     const id = idGenerator();
-    set({ id, requireLoading: false, loading: false, usage: undefined, files: {} });
+    set({ id, requireLoading: false, loading: false, usage: undefined, files: {}, checkpoint: 0 });
   },
 
   loadChat: (id) => {
-    set({ id, requireLoading: true, loading: false, usage: undefined, files: {} });
+    set({ id, requireLoading: true, loading: false, usage: undefined, files: {}, checkpoint: 0 });
   },
 
   updateUsage: (id, usage) => {
@@ -53,6 +56,11 @@ export const useChatId: ReadonlyStore<ChatId> = create((set, get) => ({
   updateFile: (id, key, value) => {
     if (id !== get().id) return;
     set((status) => ({ files: { ...status.files, [key]: value } }));
+  },
+
+  updateCheckpoint: (id, checkpoint) => {
+    if (id !== get().id) return;
+    set({ checkpoint });
   },
 
   loadMessages: async (setter) => {
@@ -71,6 +79,7 @@ export const useChatId: ReadonlyStore<ChatId> = create((set, get) => ({
       // 防止在拉取对话期间点击其他对话造成状态不一致
       if (capturedId === get().id) {
         setter(messages);
+        set({ checkpoint: messages.length });
       }
     } catch (error) {
       toast.error("载入对话失败", {
@@ -90,7 +99,7 @@ export function useChatContext() {
   const id = useChatId((state) => state.id);
   const requireLoading = useChatId((state) => state.requireLoading);
 
-  const { messages, sendMessage, status, setMessages, stop } = useChat({
+  const { messages, sendMessage, status, setMessages, stop, error, clearError } = useChat({
     id: id,
     transport: new Agent(),
   });
@@ -107,5 +116,7 @@ export function useChatContext() {
     sendMessage,
     status,
     stop,
+    error,
+    clearError,
   };
 }

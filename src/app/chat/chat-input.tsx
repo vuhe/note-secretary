@@ -37,12 +37,12 @@ type SendMessageOptions =
 
 interface ChatInputProps {
   status: ChatStatus;
-  messageLens: number;
   sendMessage: (msg: SendMessageOptions, options?: ChatRequestOptions) => Promise<void>;
   stop: () => Promise<void>;
+  clearError: () => void;
 }
 
-export default function ChatInput({ status, messageLens, sendMessage, stop }: ChatInputProps) {
+export default function ChatInput({ status, sendMessage, stop, clearError }: ChatInputProps) {
   const persona = usePersona((state) => state.selected);
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
 
@@ -54,17 +54,18 @@ export default function ChatInput({ status, messageLens, sendMessage, stop }: Ch
       }
 
       if (status === "error") {
-        // TODO: 错误清空处理
+        clearError();
         throw "防止清理未提交的数据";
       }
 
       if (!persona) return;
       const chatId = useChatId.getState().id;
+      const checkpoint = useChatId.getState().checkpoint;
       const options: ChatRequestOptions = {
         metadata: persona,
         body: {
           chatId,
-          lastMessageLens: messageLens,
+          lastMessageLens: checkpoint,
         } as SendMessageOptionBody,
       };
 
@@ -101,7 +102,7 @@ export default function ChatInput({ status, messageLens, sendMessage, stop }: Ch
         void sendMessage({ files }, options);
       }
     },
-    [status, messageLens, sendMessage, stop, persona],
+    [status, sendMessage, stop, clearError, persona],
   );
 
   return (
