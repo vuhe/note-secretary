@@ -3,7 +3,6 @@ import { convertToModelMessages, type FilePart, type TextPart, type UIMessage } 
 import { useChatId } from "@/hooks/use-chat";
 import { fileIdGenerator } from "@/lib/utils";
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type MessageDataPart = {
   file: FilePart | TextPart;
 };
@@ -85,7 +84,6 @@ export async function convertMessages(chatId: string, messages: DisplayMessage[]
     convertDataPart: (it) => {
       switch (it.type) {
         // 未来可能会增加定义
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         case "data-file":
           return it.data;
         default:

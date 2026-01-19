@@ -1,6 +1,6 @@
-# Tauri 2.0 + Next.js 16 App Router Template
+# Note Secretary
 
-![Tauri window screenshot](public/tauri-nextjs-template-2_screenshot.png)
+[Tauri 2.0 + Next.js 16 App Router Template](https://github.com/kvnxiao/tauri-nextjs-template)
 
 This is a [Tauri](https://v2.tauri.app/) project template using [Next.js](https://nextjs.org/),
 bootstrapped by combining [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app)
@@ -20,8 +20,7 @@ manager, and uses the [App Router](https://nextjs.org/docs/app) model for Next.j
     fully accessible UI components, which integrate nicely with TailwindCSS
 - Opinionated formatting and linting already setup and enabled
   - [Biome](https://biomejs.dev/) for a combination of fast formatting, linting, and
-    import sorting of TypeScript code, and [ESLint](https://eslint.org/) for any missing
-    Next.js linter rules not covered by Biome
+    import sorting of TypeScript code
   - [clippy](https://github.com/rust-lang/rust-clippy) and
     [rustfmt](https://github.com/rust-lang/rustfmt) for Rust code
 - GitHub Actions to check code formatting and linting for both TypeScript and Rust
@@ -29,18 +28,6 @@ manager, and uses the [App Router](https://nextjs.org/docs/app) model for Next.j
 ## Getting Started
 
 ### Running development server and use Tauri window
-
-After cloning for the first time, change your app identifier inside
-`src-tauri/tauri.conf.json` to your own:
-
-```jsonc
-{
-  // ...
-  // The default "com.tauri.dev" will prevent you from building in release mode
-  "identifier": "com.my-application-name.app",
-  // ...
-}
-```
 
 To develop and run the frontend in a Tauri window:
 
@@ -77,18 +64,6 @@ Tauri frontend, only SSG can be used since SSR requires an active Node.js server
 
 Please read into the Next.js documentation for [Static Exports](https://nextjs.org/docs/app/building-your-application/deploying/static-exports)
 for an explanation of supported / unsupported features and caveats.
-
-### `next/image`
-
-The [`next/image` component](https://nextjs.org/docs/basic-features/image-optimization)
-is an enhancement over the regular `<img>` HTML element with server-side optimizations
-to dynamically scale the image quality. This is only supported when deploying the
-frontend onto Vercel directly, and must be disabled to properly export the frontend
-statically. As such, the
-[`unoptimized` property](https://nextjs.org/docs/api-reference/next/image#unoptimized)
-is set to true for the `next/image` component in the `next.config.js` configuration.
-This will allow the image to be served as-is, without changes to its quality, size,
-or format.
 
 ### ReferenceError: window/navigator is not defined
 

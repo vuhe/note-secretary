@@ -15,7 +15,6 @@ export function safeError(error: unknown) {
   try {
     return new Error(JSON.stringify(error));
   } catch {
-    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     return new Error(String(error));
   }
 }
@@ -27,7 +26,6 @@ export function safeErrorString(error: unknown) {
   try {
     return JSON.stringify(error);
   } catch {
-    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     return String(error);
   }
 }

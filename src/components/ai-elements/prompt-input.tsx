@@ -310,7 +310,6 @@ export const PromptInput = ({
 
   // Keep a ref to files for cleanup on unmounting (avoids stale closure)
   const filesRef = useRef(files);
-  // eslint-disable-next-line react-hooks/refs
   filesRef.current = files;
 
   const matchesAccept = useCallback(
@@ -459,7 +458,6 @@ export const PromptInput = ({
     try {
       const response = await fetch(url);
       const blob = await response.blob();
-      // eslint-disable-next-line @typescript-eslint/return-await
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onloadend = () => {

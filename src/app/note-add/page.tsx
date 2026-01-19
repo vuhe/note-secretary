@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useId } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,10 @@ export default function Page() {
     [router, id],
   );
 
+  const formId = useId();
+  const categoryId = useId();
+  const titleId = useId();
+
   return (
     <SidebarInset key="note-add">
       <header
@@ -65,8 +69,7 @@ export default function Page() {
         </div>
       </header>
       <div className="@container/main flex flex-1 items-center justify-center min-h-0 mb-(--header-height)">
-        {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-        <form id="note-add-form" className="min-w-70" onSubmit={handleSubmit(addNote)}>
+        <form id={formId} className="min-w-70" onSubmit={handleSubmit(addNote)}>
           <FieldSet>
             <FieldGroup>
               <Controller
@@ -74,10 +77,10 @@ export default function Page() {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="note-add-form-category">分类</FieldLabel>
+                    <FieldLabel htmlFor={categoryId}>分类</FieldLabel>
                     <Input
                       {...field}
-                      id="note-add-form-category"
+                      id={categoryId}
                       aria-invalid={fieldState.invalid}
                       placeholder="请输入笔记分类……"
                       autoComplete="off"
@@ -91,10 +94,10 @@ export default function Page() {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="note-add-form-title">标题</FieldLabel>
+                    <FieldLabel htmlFor={titleId}>标题</FieldLabel>
                     <Input
                       {...field}
-                      id="note-add-form-title"
+                      id={titleId}
                       aria-invalid={fieldState.invalid}
                       placeholder="请输入笔记标题……"
                       autoComplete="off"
@@ -106,7 +109,7 @@ export default function Page() {
             </FieldGroup>
             <FieldSeparator />
             <Field orientation="horizontal">
-              <Button type="submit" form="note-add-form">
+              <Button type="submit" form={formId}>
                 新建
               </Button>
               <Button

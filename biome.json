@@ -34,13 +34,22 @@
   },
   "linter": {
     "enabled": true,
+    "domains": {
+      "project": "all",
+      "react": "all",
+      "next": "all"
+    },
     "rules": {
       "a11y": "off",
       "recommended": true,
       "correctness": {
-        "useHookAtTopLevel": "error"
+        "useHookAtTopLevel": "error",
+        "useImportExtensions": "off"
       },
-      "nursery": {},
+      "nursery": {
+        "noFloatingPromises": "error",
+        "useAwaitThenable": "off"
+      },
       "suspicious": {
         "useGoogleFontDisplay": "error",
         "noDocumentImportInPage": "error",

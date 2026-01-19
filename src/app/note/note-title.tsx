@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence } from "motion/react";
-import { useCallback, useState } from "react";
+import { useCallback, useId, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import AnimateDiv from "@/components/animation/animate-div";
@@ -82,10 +82,14 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
     });
   }, [note, deleteConfirm, router]);
 
+  const formId = useId();
+  const categoryId = useId();
+  const titleId = useId();
+  const summaryId = useId();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-      <form id="note-metadata-form" onSubmit={handleSubmit(onSubmit)}>
+      <form id={formId} onSubmit={handleSubmit(onSubmit)}>
         <DialogTrigger asChild>
           <Button size="sm" variant="ghost" className="-ml-3">
             <span className="text-base font-medium">{`${note.category} - ${note.title}`}</span>
@@ -103,10 +107,10 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="note-metadata-form-category">分类</FieldLabel>
+                    <FieldLabel htmlFor={categoryId}>分类</FieldLabel>
                     <Input
                       {...field}
-                      id="note-metadata-form-category"
+                      id={categoryId}
                       aria-invalid={fieldState.invalid}
                       placeholder="请输入笔记分类……"
                       autoComplete="off"
@@ -120,10 +124,10 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="note-metadata-form-title">标题</FieldLabel>
+                    <FieldLabel htmlFor={titleId}>标题</FieldLabel>
                     <Input
                       {...field}
-                      id="note-metadata-form-title"
+                      id={titleId}
                       aria-invalid={fieldState.invalid}
                       placeholder="请输入笔记标题……"
                       autoComplete="off"
@@ -137,13 +141,13 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="note-metadata-form-summary">摘要</FieldLabel>
+                    <FieldLabel htmlFor={summaryId}>摘要</FieldLabel>
                     <FieldDescription>
                       用于提供给&nbsp;AI&nbsp;搜索、处理的摘要信息，作为附件发送给&nbsp;AI&nbsp;时仅提供此信息不会提供正文
                     </FieldDescription>
                     <Textarea
                       {...field}
-                      id="note-metadata-form-summary"
+                      id={summaryId}
                       aria-invalid={fieldState.invalid}
                       placeholder="请输入笔记摘要……"
                       autoComplete="off"
@@ -167,7 +171,7 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
                   <DialogClose asChild>
                     <Button variant="outline">取消</Button>
                   </DialogClose>
-                  <Button type="submit" form="note-metadata-form">
+                  <Button type="submit" form={formId}>
                     保存
                   </Button>
                 </AnimateDiv>

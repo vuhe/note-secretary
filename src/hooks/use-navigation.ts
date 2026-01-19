@@ -30,7 +30,6 @@ export function useNavigation() {
       .then((noteList) => {
         const categoryMap: Record<string, NavNote[]> = {};
         noteList.forEach((note) => {
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (!categoryMap[note.category]) {
             categoryMap[note.category] = [];
           }
