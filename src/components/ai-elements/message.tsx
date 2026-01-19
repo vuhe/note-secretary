@@ -73,7 +73,7 @@ export const MessageAction = ({
 
 export type MessageResponseProps = MarkdownDisplayProps;
 
-// biome-ignore lint/style/useComponentExportOnlyModules: React.memo Component
+// biome-ignore lint/style/useComponentExportOnlyModules: React.memo 组件
 export const MessageResponse = memo(
   ({ className, ...props }: MessageResponseProps) => (
     <MarkdownDisplay

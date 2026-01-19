@@ -104,7 +104,7 @@ export function useChatContext() {
     transport: new Agent(),
   });
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: listen requireLoading change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 监听 requireLoading 变化
   useEffect(() => {
     const state = useChatId.getState();
     if (!state.requireLoading || state.loading) return;

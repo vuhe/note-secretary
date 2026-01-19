@@ -240,6 +240,7 @@ export const PromptInputActionAddAttachments = ({
 
   const onSelect = useCallback(async () => {
     try {
+      // biome-ignore lint/nursery/useAwaitThenable: 误报
       const selected = await open({
         title: "选择要上传的文件",
         multiple: attachments.multipleSelect,
@@ -457,6 +458,7 @@ export const PromptInput = ({
   const convertBlobUrlToDataUrl = async (url: string): Promise<string | null> => {
     try {
       const response = await fetch(url);
+      // biome-ignore lint/nursery/useAwaitThenable: 误报
       const blob = await response.blob();
       return new Promise((resolve) => {
         const reader = new FileReader();

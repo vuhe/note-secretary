@@ -8,7 +8,7 @@ import {
   SettingsIcon,
 } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
-import type { ComponentProps } from "react";
+import { type ComponentProps, useId } from "react";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
@@ -30,6 +30,7 @@ import { type NavNoteCategory, useNavigation } from "@/hooks/use-navigation";
 import useSafeRoute from "@/hooks/use-router";
 
 function NavSearch({ ...props }: ComponentProps<"form">) {
+  const searchId = useId();
   return (
     <form {...props}>
       <SidebarGroup className="py-0">
@@ -37,7 +38,7 @@ function NavSearch({ ...props }: ComponentProps<"form">) {
           <Label htmlFor="search" className="sr-only">
             Search
           </Label>
-          <SidebarInput id="search" placeholder="搜索对话和笔记" className="pl-8" />
+          <SidebarInput id={searchId} placeholder="搜索对话和笔记" className="pl-8" />
           <Search className="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 opacity-50 select-none" />
         </SidebarGroupContent>
       </SidebarGroup>

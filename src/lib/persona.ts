@@ -107,6 +107,7 @@ export class Persona {
   }
 
   async supportedFile(mimeType: string) {
+    // biome-ignore lint/nursery/useAwaitThenable: supportedUrls 可能是 Promise
     const supported = await this.supportedUrls;
     this.supportedUrls = supported; // 避免多次重复调用昂贵的计算函数
     const supportedTypes = Object.keys(supported);

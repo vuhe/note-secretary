@@ -70,6 +70,7 @@ export default function ChatInput({ status, sendMessage, stop, clearError }: Cha
       // 是否上传了不支持的文件筛查
       for (const file of message.files) {
         // TODO: 需要检查是否有文档总结 AI
+        // biome-ignore lint/nursery/useAwaitThenable: 误报
         const isSupportedFile = (await persona.supportedFile(file.mediaType)) || false;
         if (!isSupportedFile) {
           const filename = file.filename ? ` '${file.filename}' ` : "";

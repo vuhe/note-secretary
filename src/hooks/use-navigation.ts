@@ -22,7 +22,7 @@ export interface NavNoteCategory {
 }
 
 export function useNavigation() {
-  const [search, setSearch] = useState<string>("");
+  const [_search, setSearch] = useState<string>("");
   const [notes, setNotes] = useState<NavNoteCategory[]>([]);
 
   const getAllNotes = useCallback(() => {

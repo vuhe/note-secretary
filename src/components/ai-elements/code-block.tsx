@@ -147,6 +147,7 @@ export const CodeBlockCopyButton = ({
     }
 
     try {
+      // biome-ignore lint/nursery/useAwaitThenable: 误报
       await navigator.clipboard.writeText(code);
       setIsCopied(true);
       onCopy?.();

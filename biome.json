@@ -48,7 +48,7 @@
       },
       "nursery": {
         "noFloatingPromises": "error",
-        "useAwaitThenable": "off"
+        "useAwaitThenable": "warn"
       },
       "suspicious": {
         "useGoogleFontDisplay": "error",
