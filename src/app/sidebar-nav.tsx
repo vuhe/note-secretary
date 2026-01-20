@@ -8,7 +8,7 @@ import {
   SettingsIcon,
 } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { type ComponentProps, useId } from "react";
+import { type ChangeEvent, type ComponentProps, useCallback, useId } from "react";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
@@ -29,8 +29,20 @@ import {
 import { type NavNoteCategory, useNavigation } from "@/hooks/use-navigation";
 import useSafeRoute from "@/hooks/use-router";
 
-function NavSearch({ ...props }: ComponentProps<"form">) {
+type NavSearchProps = ComponentProps<"form"> & {
+  setText: (search: string) => void;
+};
+
+function NavSearch({ setText, ...props }: NavSearchProps) {
   const searchId = useId();
+
+  const handleChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setText(event.target.value);
+    },
+    [setText],
+  );
+
   return (
     <form {...props}>
       <SidebarGroup className="py-0">
@@ -38,7 +50,12 @@ function NavSearch({ ...props }: ComponentProps<"form">) {
           <Label htmlFor="search" className="sr-only">
             Search
           </Label>
-          <SidebarInput id={searchId} placeholder="搜索对话和笔记" className="pl-8" />
+          <SidebarInput
+            id={searchId}
+            placeholder="搜索对话和笔记"
+            className="pl-8"
+            onChange={handleChange}
+          />
           <Search className="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 opacity-50 select-none" />
         </SidebarGroupContent>
       </SidebarGroup>
@@ -170,12 +187,12 @@ const data = {
 };
 
 export function SidebarNavigation() {
-  const { notes } = useNavigation();
+  const { notes, setSearch } = useNavigation();
 
   return (
     <Sidebar collapsible="offcanvas" variant="inset">
       <SidebarHeader>
-        <NavSearch />
+        <NavSearch setText={setSearch} />
       </SidebarHeader>
       <SidebarContent>
         <NavChatGroup group={data.chats} />

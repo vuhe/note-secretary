@@ -1,66 +1,72 @@
 "use client";
 
 import { CheckIcon, DramaIcon } from "lucide-react";
-import { useState } from "react";
+import { type ComponentProps, useState } from "react";
 
-import {
-  ModelSelector,
-  ModelSelectorContent,
-  ModelSelectorEmpty,
-  ModelSelectorGroup,
-  ModelSelectorInput,
-  ModelSelectorItem,
-  ModelSelectorList,
-  ModelSelectorName,
-  ModelSelectorTrigger,
-} from "@/components/ai-elements/model-selector";
 import { PromptInputButton } from "@/components/ai-elements/prompt-input";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { usePersona } from "@/hooks/use-persona";
+import { cn } from "@/lib/utils";
+
+const PersonaName = ({ className, ...props }: ComponentProps<"span">) => (
+  <span className={cn("flex-1 truncate text-left", className)} {...props} />
+);
 
 export default function ChatPersona() {
   const personas = usePersona((state) => state.personas);
   const providers = usePersona((state) => state.providers);
   const selected = usePersona((state) => state.selected);
-  const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
-    <ModelSelector onOpenChange={setModelSelectorOpen} open={modelSelectorOpen}>
-      <ModelSelectorTrigger asChild>
+    <Dialog onOpenChange={setOpen} open={open}>
+      <DialogTrigger asChild>
         <PromptInputButton>
           <DramaIcon size={16} />
-          {selected && <ModelSelectorName>{selected.id}</ModelSelectorName>}
+          {selected && <PersonaName>{selected.id}</PersonaName>}
         </PromptInputButton>
-      </ModelSelectorTrigger>
-      <ModelSelectorContent>
-        <ModelSelectorInput placeholder="搜索模型..." />
-        <ModelSelectorList>
-          <ModelSelectorEmpty>未找到模型</ModelSelectorEmpty>
-          {providers.map((chef) => (
-            <ModelSelectorGroup heading={chef} key={chef}>
-              {personas
-                .filter((m) => m.provider === chef)
-                .map((m) => (
-                  <ModelSelectorItem
-                    key={m.id}
-                    onSelect={() => {
-                      usePersona.getState().setSelected(m.id);
-                      setModelSelectorOpen(false);
-                    }}
-                    value={m.id}
-                  >
-                    <DramaIcon size={12} />
-                    <ModelSelectorName>{m.id}</ModelSelectorName>
-                    {selected?.id === m.id ? (
-                      <CheckIcon className="ml-auto size-4" />
-                    ) : (
-                      <div className="ml-auto size-4" />
-                    )}
-                  </ModelSelectorItem>
-                ))}
-            </ModelSelectorGroup>
-          ))}
-        </ModelSelectorList>
-      </ModelSelectorContent>
-    </ModelSelector>
+      </DialogTrigger>
+      <DialogContent className="p-0">
+        <DialogTitle className="sr-only">Persona Selector</DialogTitle>
+        <Command className="**:data-[slot=command-input-wrapper]:h-auto">
+          <CommandInput className="h-auto py-3.5" placeholder="搜索模型..." />
+          <CommandList>
+            <CommandEmpty>未找到模型</CommandEmpty>
+            {providers.map((chef) => (
+              <CommandGroup heading={chef} key={chef}>
+                {personas
+                  .filter((m) => m.provider === chef)
+                  .map((m) => (
+                    <CommandItem
+                      key={m.id}
+                      onSelect={() => {
+                        usePersona.getState().setSelected(m.id);
+                        setOpen(false);
+                      }}
+                      value={m.id}
+                    >
+                      <DramaIcon size={12} />
+                      <PersonaName>{m.id}</PersonaName>
+                      {selected?.id === m.id ? (
+                        <CheckIcon className="ml-auto size-4" />
+                      ) : (
+                        <div className="ml-auto size-4" />
+                      )}
+                    </CommandItem>
+                  ))}
+              </CommandGroup>
+            ))}
+          </CommandList>
+        </Command>
+      </DialogContent>
+    </Dialog>
   );
 }

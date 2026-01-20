@@ -21,32 +21,41 @@ export interface NavNoteCategory {
   notes: NavNote[];
 }
 
+export async function fetchAllNotes(search: string): Promise<NavNoteCategory[]> {
+  let args: { search: string } | undefined;
+  if (search.trim().length > 0) {
+    args = { search };
+  }
+
+  const noteList = await invoke<NavNote[]>("get_all_notes", args);
+  const categoryMap: Record<string, NavNote[]> = {};
+  noteList.forEach((note) => {
+    if (!categoryMap[note.category]) {
+      categoryMap[note.category] = [];
+    }
+    categoryMap[note.category].push(note);
+  });
+  return Object.keys(categoryMap)
+    .sort((a, b) => collator.compare(a, b))
+    .map((categoryTitle) => {
+      const sortedNotes = categoryMap[categoryTitle].sort((a, b) =>
+        collator.compare(a.title, b.title),
+      );
+
+      return {
+        title: categoryTitle,
+        notes: sortedNotes,
+      };
+    });
+}
+
 export function useNavigation() {
-  const [_search, setSearch] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
   const [notes, setNotes] = useState<NavNoteCategory[]>([]);
 
   const getAllNotes = useCallback(() => {
-    invoke<NavNote[]>("get_all_notes")
-      .then((noteList) => {
-        const categoryMap: Record<string, NavNote[]> = {};
-        noteList.forEach((note) => {
-          if (!categoryMap[note.category]) {
-            categoryMap[note.category] = [];
-          }
-          categoryMap[note.category].push(note);
-        });
-        const sortedCategories: NavNoteCategory[] = Object.keys(categoryMap)
-          .sort((a, b) => collator.compare(a, b))
-          .map((categoryTitle) => {
-            const sortedNotes = categoryMap[categoryTitle].sort((a, b) =>
-              collator.compare(a.title, b.title),
-            );
-
-            return {
-              title: categoryTitle,
-              notes: sortedNotes,
-            };
-          });
+    fetchAllNotes(search)
+      .then((sortedCategories) => {
         setNotes(sortedCategories);
       })
       .catch((error: unknown) => {
@@ -55,7 +64,7 @@ export function useNavigation() {
           closeButton: true,
         });
       });
-  }, []);
+  }, [search]);
 
   // 初始化调用一次准备数据
   useEffect(() => {
