@@ -3,7 +3,6 @@
 import { CheckIcon, DramaIcon } from "lucide-react";
 import { type ComponentProps, useState } from "react";
 
-import { PromptInputButton } from "@/components/ai-elements/prompt-input";
 import {
   Command,
   CommandEmpty,
@@ -13,7 +12,9 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { InputGroupButton } from "@/components/ui/input-group";
 import { usePersona } from "@/hooks/use-persona";
+import { usePrompt } from "@/hooks/use-prompt";
 import { cn } from "@/lib/utils";
 
 const PersonaName = ({ className, ...props }: ComponentProps<"span">) => (
@@ -23,18 +24,18 @@ const PersonaName = ({ className, ...props }: ComponentProps<"span">) => (
 export default function ChatPersona() {
   const personas = usePersona((state) => state.personas);
   const providers = usePersona((state) => state.providers);
-  const selected = usePersona((state) => state.selected);
+  const selected = usePrompt((state) => state.persona);
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
-        <PromptInputButton>
+        <InputGroupButton size="sm">
           <DramaIcon size={16} />
           {selected && <PersonaName>{selected.id}</PersonaName>}
-        </PromptInputButton>
+        </InputGroupButton>
       </DialogTrigger>
-      <DialogContent className="p-0 **:data-[slot='dialog-close']:top-3">
+      <DialogContent className="p-0 **:data-[slot=dialog-close]:top-3">
         <DialogTitle className="sr-only">Persona Selector</DialogTitle>
         <Command className="**:data-[slot=command-input-wrapper]:h-auto">
           <CommandInput placeholder="搜索模型..." />
@@ -48,7 +49,7 @@ export default function ChatPersona() {
                     <CommandItem
                       key={m.id}
                       onSelect={() => {
-                        usePersona.getState().setSelected(m.id);
+                        usePrompt.getState().selectPersona(m);
                         setOpen(false);
                       }}
                       value={m.id}

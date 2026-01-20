@@ -1,9 +1,10 @@
 import { useChat } from "@ai-sdk/react";
 import { invoke } from "@tauri-apps/api/core";
 import { createIdGenerator, type LanguageModelUsage } from "ai";
-import { useEffect } from "react";
+import { type FormEvent, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
+import { usePrompt } from "@/hooks/use-prompt";
 import { Agent } from "@/lib/agent";
 import type { DisplayMessage } from "@/lib/message";
 import { safeErrorString } from "@/lib/utils";
@@ -111,12 +112,40 @@ export function useChatContext() {
     void state.loadMessages(setMessages);
   }, [requireLoading, setMessages]);
 
+  const handleSubmit = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (status === "submitted" || status === "streaming") {
+        void stop();
+        return;
+      }
+
+      if (status === "error") {
+        clearError();
+        return;
+      }
+
+      usePrompt
+        .getState()
+        .submit(id)
+        .then((submitted) => {
+          if (!submitted) return;
+          void sendMessage(submitted.message, submitted.options);
+        })
+        .catch((error: unknown) => {
+          toast.warning("发送失败", {
+            description: safeErrorString(error),
+            closeButton: true,
+          });
+        });
+    },
+    [id, status, stop, clearError, sendMessage],
+  );
+
   return {
     messages,
-    sendMessage,
     status,
-    stop,
     error,
-    clearError,
+    handleSubmit,
   };
 }

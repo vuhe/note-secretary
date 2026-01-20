@@ -11,18 +11,12 @@ type ReadonlyStore<T> = UseBoundStore<ReadonlyStoreApi<T>>;
 interface PersonaStatus {
   personas: Persona[];
   providers: string[];
-  selected?: Persona;
-  setSelected: (id: string) => void;
   update: () => Promise<void>;
 }
 
-export const usePersona: ReadonlyStore<PersonaStatus> = create((set, get) => ({
+export const usePersona: ReadonlyStore<PersonaStatus> = create((set) => ({
   personas: [],
   providers: [],
-  setSelected: (id) => {
-    const selected = get().personas.find((it) => it.id === id);
-    set({ selected });
-  },
   update: async () => {
     try {
       const list: unknown[] = await invoke("get_all_personas");

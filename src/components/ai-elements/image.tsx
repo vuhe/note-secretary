@@ -1,9 +1,10 @@
 import { convertFileSrc } from "@tauri-apps/api/core";
 import type { ComponentProps } from "react";
 import { useChatId } from "@/hooks/use-chat";
+import type { TauriChatFileType } from "@/lib/message";
 
 interface TauriImageSrc {
-  type: "file" | "tauri" | "ref";
+  type: TauriChatFileType;
   value: string;
 }
 
@@ -15,15 +16,15 @@ export function TauriImage({ loader, alt, ...props }: TauriImageProps) {
   let src: string;
 
   switch (loader.type) {
-    case "file": {
+    case "url": {
       src = loader.value;
       break;
     }
-    case "tauri": {
+    case "local-path": {
       src = `${convertFileSrc(loader.value, "image")}?type=file`;
       break;
     }
-    case "ref": {
+    case "saved-id": {
       const path = `${chatId}/${loader.value}`;
       src = `${convertFileSrc(path, "image")}?type=id`;
       break;

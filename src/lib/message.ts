@@ -9,6 +9,8 @@ type MessageDataPart = {
 
 export type DisplayMessage = UIMessage<unknown, MessageDataPart>;
 
+export type TauriChatFileType = "url" | "local-path" | "saved-id";
+
 interface TauriChatReadFile {
   chatId: string;
   fileId: string;
@@ -16,8 +18,8 @@ interface TauriChatReadFile {
 
 interface TauriChatSaveFile extends TauriChatReadFile {
   data: {
-    kind: "file" | "tauri" | "ref";
-    data: string;
+    kind: TauriChatFileType;
+    payload: string;
   };
 }
 
@@ -103,8 +105,8 @@ export async function saveMessage(chatId: string, message: DisplayMessage, index
         chatId: chatId,
         fileId: id,
         data: {
-          kind: "file",
-          data: part.url,
+          kind: "url",
+          payload: part.url,
         },
       });
       part.url = id;

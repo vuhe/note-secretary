@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
 import { useChatId } from "@/hooks/use-chat";
-import { usePersona } from "@/hooks/use-persona";
+import { usePrompt } from "@/hooks/use-prompt";
 import type { Persona } from "@/lib/persona";
 import { cn } from "@/lib/utils";
 
@@ -171,7 +171,7 @@ const UsageOutput = ({ usage }: { usage?: LanguageModelUsage }) => {
 };
 
 export default function ChatUsage() {
-  const persona = usePersona((state) => state.selected);
+  const persona = usePrompt((state) => state.persona);
   const usage = useChatId((state) => state.usage);
   if (!persona) return null;
 

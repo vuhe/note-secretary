@@ -19,7 +19,7 @@ import { cn, safeErrorString } from "@/lib/utils";
 
 export default function Page() {
   const loading = useChatId((state) => state.loading);
-  const { messages, sendMessage, status, stop, error, clearError } = useChatContext();
+  const { messages, status, error, handleSubmit } = useChatContext();
 
   return (
     <SidebarInset key="chat">
@@ -79,7 +79,7 @@ export default function Page() {
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
-        <ChatInput status={status} sendMessage={sendMessage} stop={stop} clearError={clearError} />
+        <ChatInput status={status} handleSubmit={handleSubmit} />
       </div>
     </SidebarInset>
   );

@@ -15,13 +15,13 @@ const FILE_DIR_NAME: &str = "files";
 const DEFAULT_FILENAME: &str = "data";
 
 #[derive(Debug, Clone, Deserialize)]
-#[serde(tag = "kind", content = "data")]
+#[serde(tag = "kind", content = "payload")]
 enum ChatFileData {
-  #[serde(rename = "file")]
+  #[serde(rename = "url")]
   Url(String),
-  #[serde(rename = "tauri")]
+  #[serde(rename = "local-path")]
   Path(PathBuf),
-  #[serde(rename = "ref")]
+  #[serde(rename = "saved-id")]
   RefId(String),
 }
 

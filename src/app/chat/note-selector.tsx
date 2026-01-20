@@ -1,3 +1,5 @@
+"use client";
+
 import { listen } from "@tauri-apps/api/event";
 import { NotebookTextIcon } from "lucide-react";
 import { type ComponentProps, type ReactNode, useCallback, useEffect, useState } from "react";
@@ -58,7 +60,7 @@ export default function NoteSelector({ onSelect, children }: NoteSelectorProps) 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="p-0 **:data-[slot='dialog-close']:top-3">
+      <DialogContent className="p-0 **:data-[slot=dialog-close]:top-3">
         <DialogTitle className="sr-only">Note Selector</DialogTitle>
         <Command className="**:data-[slot=command-input-wrapper]:h-auto" shouldFilter={false}>
           <CommandInput placeholder="搜索笔记..." onValueChange={setSearch} />
