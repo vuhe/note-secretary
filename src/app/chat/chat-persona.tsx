@@ -34,10 +34,10 @@ export default function ChatPersona() {
           {selected && <PersonaName>{selected.id}</PersonaName>}
         </PromptInputButton>
       </DialogTrigger>
-      <DialogContent className="p-0">
+      <DialogContent className="p-0 **:data-[slot='dialog-close']:top-3">
         <DialogTitle className="sr-only">Persona Selector</DialogTitle>
         <Command className="**:data-[slot=command-input-wrapper]:h-auto">
-          <CommandInput className="h-auto py-3.5" placeholder="搜索模型..." />
+          <CommandInput placeholder="搜索模型..." />
           <CommandList>
             <CommandEmpty>未找到模型</CommandEmpty>
             {providers.map((chef) => (

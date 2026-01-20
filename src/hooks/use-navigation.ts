@@ -10,7 +10,7 @@ const collator = new Intl.Collator(undefined, {
   sensitivity: "base",
 });
 
-interface NavNote {
+export interface NavNote {
   id: string;
   category: string;
   title: string;
