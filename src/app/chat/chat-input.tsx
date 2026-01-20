@@ -126,18 +126,23 @@ export default function ChatInput({ status, sendMessage, stop, clearError }: Cha
   return (
     <div className="px-2 pb-2">
       <PromptInput multiple onSubmit={handleSubmit}>
-        <PromptInputAttachments>
+        <PromptInputAttachments className="pb-0">
           {(attachment) => <PromptInputAttachment data={attachment} />}
         </PromptInputAttachments>
         <PromptInputBody>
-          <PromptInputTextarea placeholder="询问任何问题" value={text} onChange={handleChange} />
+          <PromptInputTextarea
+            className="pb-0"
+            placeholder="询问任何问题"
+            value={text}
+            onChange={handleChange}
+          />
         </PromptInputBody>
         <PromptInputFooter>
           <PromptInputTools>
             <ChatPersona />
             <PromptInputButton
               onClick={() => {
-                setUseWebSearch(!useWebSearch);
+                setUseWebSearch((it) => !it);
               }}
               variant={useWebSearch ? "default" : "ghost"}
             >
