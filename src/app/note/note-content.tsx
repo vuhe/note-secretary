@@ -3,7 +3,7 @@
 import { CircleSlash2Icon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 
-import AnimateDiv from "@/components/animation/animate-div";
+import { AnimateDiv } from "@/components/animation/animate-div";
 import { MarkdownDisplay } from "@/components/markdown/display";
 import { MarkdownSplitView } from "@/components/markdown/split";
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
@@ -16,7 +16,7 @@ interface NoteContentProps {
   setDraft: (s: string) => void;
 }
 
-export default function NoteContent({ content, editing, draft, setDraft }: NoteContentProps) {
+export function NoteContent({ content, editing, draft, setDraft }: NoteContentProps) {
   return (
     <AnimatePresence mode="wait">
       {editing !== "display" ? (

@@ -6,7 +6,7 @@ import { useChatId } from "@/hooks/use-chat";
 /** note id 生成器 */
 const noteId = createIdGenerator({ prefix: "note" });
 
-export default function useSafeRoute() {
+export function useSafeRoute() {
   const router = useRouter();
 
   const goToNewChat = useCallback(() => {

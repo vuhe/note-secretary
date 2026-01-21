@@ -24,8 +24,8 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-import ChatPersona from "@/app/chat/chat-persona";
-import NoteSelector from "@/app/chat/note-selector";
+import { ChatPersona } from "@/app/chat/chat-persona";
+import { NoteSelector } from "@/app/chat/note-selector";
 import { TauriImage } from "@/components/ai-elements/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -274,7 +274,7 @@ interface ChatInputProps {
   handleSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
 
-export default function ChatInput({ status, handleSubmit }: ChatInputProps) {
+export function ChatInput({ status, handleSubmit }: ChatInputProps) {
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false);
 
   // Attach drop handlers on the nearest form and document

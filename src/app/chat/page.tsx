@@ -2,10 +2,10 @@
 
 import { AlertCircleIcon, Loader2Icon, MessageSquareIcon } from "lucide-react";
 
-import ChatContext from "@/app/chat/chat-context";
-import ChatInput from "@/app/chat/chat-input";
-import ChatMessage from "@/app/chat/chat-message";
-import ChatUsage from "@/app/chat/chat-usage";
+import { ChatContext } from "@/app/chat/chat-context";
+import { ChatInput } from "@/app/chat/chat-input";
+import { ChatMessage } from "@/app/chat/chat-message";
+import { ChatUsage } from "@/app/chat/chat-usage";
 import {
   Conversation,
   ConversationContent,
@@ -17,6 +17,7 @@ import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { useChatContext, useChatId } from "@/hooks/use-chat";
 import { cn, safeErrorString } from "@/lib/utils";
 
+// biome-ignore lint/style/noDefaultExport: Next.js Page
 export default function Page() {
   const loading = useChatId((state) => state.loading);
   const { messages, status, error, handleSubmit } = useChatContext();

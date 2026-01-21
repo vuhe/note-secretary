@@ -32,6 +32,7 @@ const jetbrainsMono = localFont({
   fallback: ["ui-monospace", "SF Mono", "Monaco", "Menlo", "Consolas", "PingFang SC", "monospace"],
 });
 
+// biome-ignore lint/style/noDefaultExport: Next.js Layout
 export default function RootLayout({
   children,
 }: Readonly<{

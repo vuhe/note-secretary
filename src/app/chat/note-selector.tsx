@@ -25,7 +25,7 @@ interface NoteSelectorProps {
   children: ReactNode;
 }
 
-export default function NoteSelector({ onSelect, children }: NoteSelectorProps) {
+export function NoteSelector({ onSelect, children }: NoteSelectorProps) {
   const [search, setSearch] = useState<string>("");
   const [notes, setNotes] = useState<NavNoteCategory[]>([]);
   const [open, setOpen] = useState(false);

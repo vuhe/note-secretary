@@ -4,7 +4,7 @@ import { Loader2Icon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useCallback } from "react";
 
-import AnimateDiv from "@/components/animation/animate-div";
+import { AnimateDiv } from "@/components/animation/animate-div";
 import { Button } from "@/components/ui/button";
 import type { NoteEditStatus, NoteStatus } from "@/hooks/use-note";
 
@@ -16,7 +16,7 @@ interface NoteToolbarProps {
   submitDraft: () => void;
 }
 
-export default function NoteToolbar({
+export function NoteToolbar({
   status,
   editing,
   setEditing,

@@ -17,9 +17,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { invokeAddNote, type Note, NoteSchema } from "@/hooks/use-note";
-import useSafeRoute from "@/hooks/use-router";
+import { useSafeRoute } from "@/hooks/use-router";
 import { cn } from "@/lib/utils";
 
+// biome-ignore lint/style/noDefaultExport: Next.js Page
 export default function Page() {
   const searchParams = useSearchParams();
   const router = useSafeRoute();

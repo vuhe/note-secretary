@@ -5,7 +5,7 @@ import { AnimatePresence } from "motion/react";
 import { useCallback, useId, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-import AnimateDiv from "@/components/animation/animate-div";
+import { AnimateDiv } from "@/components/animation/animate-div";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,7 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { usePlatform } from "@/hooks/use-mobile";
 import { invokeDeleteNote, type Note, NoteSchema, type NoteStatus } from "@/hooks/use-note";
-import useSafeRoute from "@/hooks/use-router";
+import { useSafeRoute } from "@/hooks/use-router";
 
 interface NoteMetadataProps {
   note: Note;
@@ -204,7 +204,7 @@ interface NoteTitleProps {
   submitMetadata: (data: Note) => void;
 }
 
-export default function NoteTitle({ status, submitMetadata }: NoteTitleProps) {
+export function NoteTitle({ status, submitMetadata }: NoteTitleProps) {
   const isDesktop = usePlatform((state) => state.isDesktop);
   if (status.status === "success") {
     if (isDesktop) {

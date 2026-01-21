@@ -21,7 +21,7 @@ const PersonaName = ({ className, ...props }: ComponentProps<"span">) => (
   <span className={cn("flex-1 truncate text-left", className)} {...props} />
 );
 
-export default function ChatPersona() {
+export function ChatPersona() {
   const personas = usePersona((state) => state.personas);
   const providers = usePersona((state) => state.providers);
   const selected = usePrompt((state) => state.persona);

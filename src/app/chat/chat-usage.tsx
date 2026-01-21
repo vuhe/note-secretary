@@ -170,7 +170,7 @@ const UsageOutput = ({ usage }: { usage?: LanguageModelUsage }) => {
   );
 };
 
-export default function ChatUsage() {
+export function ChatUsage() {
   const persona = usePrompt((state) => state.persona);
   const usage = useChatId((state) => state.usage);
   if (!persona) return null;

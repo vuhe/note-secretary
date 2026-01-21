@@ -27,7 +27,7 @@ import {
   SidebarMenuSub,
 } from "@/components/ui/sidebar";
 import { type NavNoteCategory, useNavigation } from "@/hooks/use-navigation";
-import useSafeRoute from "@/hooks/use-router";
+import { useSafeRoute } from "@/hooks/use-router";
 
 type NavSearchProps = ComponentProps<"form"> & {
   setText: (search: string) => void;

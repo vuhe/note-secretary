@@ -2,7 +2,7 @@
 
 import { type HTMLMotionProps, motion } from "motion/react";
 
-export default function AnimateDiv(props: HTMLMotionProps<"div">) {
+export function AnimateDiv(props: HTMLMotionProps<"div">) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
