@@ -2,7 +2,10 @@
 
 "use client";
 
-import { convertFileSrc } from "@tauri-apps/api/core";
+import { cjk } from "@streamdown/cjk";
+import { code } from "@streamdown/code";
+import { math } from "@streamdown/math";
+import { mermaid } from "@streamdown/mermaid";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import type { Root } from "hast";
 import { type ComponentProps, useEffect, useId } from "react";
@@ -54,7 +57,10 @@ function safeId(id: string) {
   return `markdown-${safeStr}`;
 }
 
-export type MarkdownDisplayProps = ComponentProps<typeof Streamdown>;
+export type MarkdownDisplayProps = Omit<
+  ComponentProps<typeof Streamdown>,
+  "linkSafety" | "plugins"
+>;
 
 export function MarkdownDisplay({
   rehypePlugins,
@@ -130,8 +136,14 @@ export function MarkdownDisplay({
       rehypePlugins={rehypePluginsWithDefault}
       controls={controlsWithDefault}
       className={cn(className, safeId(id))}
+      linkSafety={{ enabled: false }}
+      plugins={{
+        code: code,
+        math: math,
+        mermaid: mermaid,
+        cjk: cjk,
+      }}
       {...props}
-      cdnUrl={convertFileSrc("", "streamdown")}
     />
   );
 }

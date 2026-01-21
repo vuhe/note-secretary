@@ -1,5 +1,4 @@
 mod image;
-mod streamdown;
 
 use crate::error::{Error, Result};
 use mime_guess::mime::TEXT_PLAIN;
@@ -36,9 +35,6 @@ pub trait CustomUriScheme {
 
 impl<R: Runtime> CustomUriScheme for Builder<R> {
   fn register_custom_uri(self) -> Self {
-    self
-      .register_asynchronous_uri_scheme_protocol("image", image::handler)
-      // streamdown 资源文件
-      .register_asynchronous_uri_scheme_protocol("streamdown", streamdown::handler)
+    self.register_asynchronous_uri_scheme_protocol("image", image::handler)
   }
 }
