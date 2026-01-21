@@ -1,5 +1,8 @@
 "use client";
 
+import { ReactScan } from "@/app/react-scan";
+import "@/styles/globals.css";
+
 import { AnimatePresence } from "motion/react";
 import localFont from "next/font/local";
 import { ThemeProvider } from "next-themes";
@@ -11,8 +14,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { usePlatform } from "@/hooks/use-mobile";
 import { usePersona } from "@/hooks/use-persona";
 import { useToaster } from "@/hooks/use-toaster";
-
-import "@/styles/globals.css";
 
 const jetbrainsMono = localFont({
   src: [
@@ -47,6 +48,7 @@ export default function RootLayout({
 
   return (
     <html lang="zh" suppressHydrationWarning>
+      <ReactScan />
       <body className={`${jetbrainsMono.variable} antialiased overflow-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SidebarProvider
