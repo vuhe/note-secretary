@@ -176,7 +176,7 @@ function UserMessage({ message }: MessageProps) {
 
 export function ChatMessage(props: AgentMessageProps) {
   if (props.message.role === "user") {
-    return <UserMessage {...props} />;
+    return <UserMessage message={props.message} />;
   }
   if (props.message.role === "assistant") {
     return <AgentMessage {...props} />;
