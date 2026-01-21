@@ -46,7 +46,6 @@ function AgentMessage({ message, status, last }: AgentMessageProps) {
 
   const downloadFile = () => {
     // TODO: 处理生成的文件下载保存到本地，移动端禁用
-    console.debug("download file clicked");
   };
 
   return (
@@ -135,16 +134,15 @@ function AgentMessage({ message, status, last }: AgentMessageProps) {
                   loader={{ type: srcType, value: part.url }}
                 />
               );
-            } else {
-              return (
-                <Suggestions>
-                  <Suggestion onClick={downloadFile} suggestion={part.filename ?? "下载文件"}>
-                    <DownloadIcon />
-                    {filename(part)}
-                  </Suggestion>
-                </Suggestions>
-              );
             }
+            return (
+              <Suggestions>
+                <Suggestion onClick={downloadFile} suggestion={part.filename ?? "下载文件"}>
+                  <DownloadIcon />
+                  {filename(part)}
+                </Suggestion>
+              </Suggestions>
+            );
           }
           // TODO: DataUIPart<DATA_TYPES> 暂时没有使用
           default:
@@ -179,9 +177,9 @@ function UserMessage({ message }: MessageProps) {
 export function ChatMessage(props: AgentMessageProps) {
   if (props.message.role === "user") {
     return <UserMessage {...props} />;
-  } else if (props.message.role === "assistant") {
-    return <AgentMessage {...props} />;
-  } else {
-    return null;
   }
+  if (props.message.role === "assistant") {
+    return <AgentMessage {...props} />;
+  }
+  return null;
 }

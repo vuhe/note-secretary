@@ -209,10 +209,9 @@ export function NoteTitle({ status, submitMetadata }: NoteTitleProps) {
   if (status.status === "success") {
     if (isDesktop) {
       return <NoteMetadata note={status.value} submitMetadata={submitMetadata} />;
-    } else {
-      const title = `${status.value.category} - ${status.value.title}`;
-      return <div className="text-base font-medium select-none">{title}</div>;
     }
+    const title = `${status.value.category} - ${status.value.title}`;
+    return <div className="text-base font-medium select-none">{title}</div>;
   }
   return <div className="text-base text-muted-foreground font-medium select-none">加载中……</div>;
 }

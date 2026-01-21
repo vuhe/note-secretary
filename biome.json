@@ -51,13 +51,22 @@
         "useAwaitThenable": "warn"
       },
       "suspicious": {
+        "noConsole": "warn",
         "useGoogleFontDisplay": "error",
+        "noImplicitAnyLet": "error",
         "noDocumentImportInPage": "error",
         "noHeadImportInDocument": "error"
       },
       "style": {
         "noDefaultExport": "warn",
+        "noParameterAssign": "warn",
+        "noUselessElse": "warn",
+        "useConsistentArrayType": "warn",
+        "noNamespace": "error",
         "noHeadElement": "error",
+        "noInferrableTypes": "error",
+        "noParameterProperties": "error",
+        "useSelfClosingElements": "error",
         "useComponentExportOnlyModules": {
           "level": "error",
           "options": {
