@@ -126,7 +126,7 @@ function AgentMessage({ message, status, last }: AgentMessageProps) {
             );
           case "file": {
             const mediaType = part.mediaType.startsWith("image/") && part.url ? "image" : "file";
-            const srcType = part.url.startsWith("file-") ? "ref" : "file";
+            const srcType = part.url.startsWith("file-") ? "saved-id" : "url";
             if (mediaType === "image") {
               return (
                 <TauriImage

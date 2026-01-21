@@ -106,7 +106,7 @@ export function MessageAttachment({ data, className, onRemove, ...props }: Messa
             alt={filename || "attachment"}
             className="size-full object-cover"
             height={100}
-            loader={{ type: "ref", value: data.url }}
+            loader={{ type: "saved-id", value: data.url }}
             width={100}
           />
           {onRemove && (
