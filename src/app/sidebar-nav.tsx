@@ -8,7 +8,7 @@ import {
   SettingsIcon,
 } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { type ChangeEvent, type ComponentProps, useCallback, useId } from "react";
+import { type ChangeEventHandler, type ComponentProps, useId } from "react";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
@@ -36,12 +36,9 @@ type NavSearchProps = ComponentProps<"form"> & {
 function NavSearch({ setText, ...props }: NavSearchProps) {
   const searchId = useId();
 
-  const handleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      setText(event.target.value);
-    },
-    [setText],
-  );
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setText(event.target.value);
+  };
 
   return (
     <form {...props}>

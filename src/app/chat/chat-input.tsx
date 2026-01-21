@@ -14,11 +14,10 @@ import {
   XIcon,
 } from "lucide-react";
 import {
-  type ChangeEvent,
+  type ChangeEventHandler,
   type ClipboardEventHandler,
   type FormEvent,
   type KeyboardEventHandler,
-  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -181,9 +180,9 @@ function PromptInputTextarea() {
     }
   };
 
-  const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange: ChangeEventHandler<HTMLTextAreaElement> = (event) => {
     usePrompt.getState().changeText(event.target.value);
-  }, []);
+  };
 
   return (
     <InputGroupTextarea
@@ -205,9 +204,9 @@ function PromptInputTextarea() {
 }
 
 function PromptInputAddNotes() {
-  const onSelect = useCallback((note: NavNote) => {
+  const onSelect = (note: NavNote) => {
     usePrompt.getState().addNoteFile(note);
-  }, []);
+  };
 
   return (
     <NoteSelector onSelect={onSelect}>
@@ -219,7 +218,7 @@ function PromptInputAddNotes() {
 }
 
 function PromptInputAddFiles() {
-  const onClick = useCallback(() => {
+  const onClick = () => {
     open({
       title: "选择要上传的文件",
       multiple: true,
@@ -235,7 +234,7 @@ function PromptInputAddFiles() {
           closeButton: true,
         });
       });
-  }, []);
+  };
 
   return (
     <InputGroupButton size="sm" onClick={onClick}>

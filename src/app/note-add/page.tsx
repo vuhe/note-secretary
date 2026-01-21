@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useId } from "react";
+import { useEffect, useId } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -42,14 +42,11 @@ export default function Page() {
     reset();
   }, [id, reset]);
 
-  const addNote = useCallback(
-    (note: Note) => {
-      invokeAddNote({ ...note, id }, () => {
-        router.goToNote(id);
-      });
-    },
-    [router, id],
-  );
+  const addNote = (note: Note) => {
+    invokeAddNote({ ...note, id }, () => {
+      router.goToNote(id);
+    });
+  };
 
   const formId = useId();
   const categoryId = useId();

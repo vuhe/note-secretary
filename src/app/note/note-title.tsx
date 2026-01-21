@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence } from "motion/react";
-import { useCallback, useId, useState } from "react";
+import { useId, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import { AnimateDiv } from "@/components/animation/animate-div";
@@ -51,26 +51,20 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
     },
   });
 
-  const onOpenChange = useCallback(
-    (open: boolean) => {
-      setOpen(open);
-      if (open) return;
-      reset();
-      setDeleteConfirm(2);
-    },
-    [reset],
-  );
+  const onOpenChange = (open: boolean) => {
+    setOpen(open);
+    if (open) return;
+    reset();
+    setDeleteConfirm(2);
+  };
 
-  const onSubmit = useCallback(
-    (data: Note) => {
-      setOpen(false);
-      submitMetadata(data);
-      setDeleteConfirm(2);
-    },
-    [submitMetadata],
-  );
+  const onSubmit = (data: Note) => {
+    setOpen(false);
+    submitMetadata(data);
+    setDeleteConfirm(2);
+  };
 
-  const onDelete = useCallback(() => {
+  const onDelete = () => {
     if (deleteConfirm > 0) {
       setDeleteConfirm(deleteConfirm - 1);
       return;
@@ -80,7 +74,7 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
     invokeDeleteNote(note.id, () => {
       router.goToNewChat();
     });
-  }, [note, deleteConfirm, router]);
+  };
 
   const formId = useId();
   const categoryId = useId();

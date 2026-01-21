@@ -1,14 +1,13 @@
 "use client";
 
-import { useCallback } from "react";
 import { NoteSelector } from "@/app/chat/note-selector";
 import { InputGroupButton } from "@/components/ui/input-group";
 import type { NavNote } from "@/hooks/use-navigation";
 
 export function ChatContext() {
-  const onSelect = useCallback((_note: NavNote) => {
+  const onSelect = (_note: NavNote) => {
     // TODO:
-  }, []);
+  };
 
   return (
     <NoteSelector onSelect={onSelect}>

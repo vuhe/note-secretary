@@ -2,7 +2,6 @@
 
 import { Loader2Icon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
-import { useCallback } from "react";
 
 import { AnimateDiv } from "@/components/animation/animate-div";
 import { Button } from "@/components/ui/button";
@@ -23,16 +22,16 @@ export function NoteToolbar({
   setDraft,
   submitDraft,
 }: NoteToolbarProps) {
-  const modify = useCallback(() => {
+  const modify = () => {
     if (status.status !== "success") return;
     setDraft(status.value.content);
     setEditing("editing");
-  }, [status, setEditing, setDraft]);
+  };
 
-  const cancel = useCallback(() => {
+  const cancel = () => {
     setDraft("");
     setEditing("display");
-  }, [setEditing, setDraft]);
+  };
 
   return (
     <AnimatePresence mode="wait">

@@ -2,7 +2,7 @@
 
 import type { EditorView } from "@codemirror/view";
 import type { Root } from "hast";
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 
 import { MarkdownDisplay } from "@/components/markdown/display";
 import { MarkdownEditor } from "@/components/markdown/editor";
@@ -25,16 +25,8 @@ export function MarkdownSplitView({ content, draft, setDraft }: MarkdownSplitVie
 
   const currentScrollArea = useRef<"editor" | "preview" | "">("");
 
-  const onMouseEnterEditor = useCallback(() => {
-    currentScrollArea.current = "editor";
-  }, []);
-
-  const onMouseEnterPreview = useCallback(() => {
-    currentScrollArea.current = "preview";
-  }, []);
-
   // 计算元素位置
-  const computePositions = useCallback(() => {
+  const computePositions = () => {
     if (!editorRef.current || !treeData) return;
     if (!previewRef.current?.firstElementChild) return;
 
@@ -57,10 +49,10 @@ export function MarkdownSplitView({ content, draft, setDraft }: MarkdownSplitVie
         editorElementListRef.current.push(lineBlock.top);
         previewElementListRef.current.push((previewElements[index] as HTMLElement).offsetTop);
       });
-  }, []);
+  };
 
   // 编辑器滚动处理
-  const onEditorScroll = useCallback(() => {
+  const onEditorScroll = () => {
     if (currentScrollArea.current !== "editor") return;
     if (!editorRef.current || !previewRef.current) return;
 
@@ -105,10 +97,10 @@ export function MarkdownSplitView({ content, draft, setDraft }: MarkdownSplitVie
         break;
       }
     }
-  }, [computePositions]);
+  };
 
   // 预览区域滚动处理
-  const onPreviewScroll = useCallback(() => {
+  const onPreviewScroll = () => {
     if (currentScrollArea.current !== "preview") return;
     if (!editorRef.current || !previewRef.current) return;
 
@@ -153,7 +145,7 @@ export function MarkdownSplitView({ content, draft, setDraft }: MarkdownSplitVie
         break;
       }
     }
-  }, [computePositions]);
+  };
 
   return (
     <>
@@ -163,14 +155,18 @@ export function MarkdownSplitView({ content, draft, setDraft }: MarkdownSplitVie
         editorRef={editorRef}
         onContentChange={setDraft}
         onContentScroll={onEditorScroll}
-        onMouseEnterContent={onMouseEnterEditor}
+        onMouseEnterContent={() => {
+          currentScrollArea.current = "editor";
+        }}
       />
       <Separator orientation="vertical" />
       <div
         ref={previewRef}
         className="flex-1 h-full overflow-y-auto relative"
         onScroll={onPreviewScroll}
-        onMouseEnter={onMouseEnterPreview}
+        onMouseEnter={() => {
+          currentScrollArea.current = "preview";
+        }}
       >
         <MarkdownDisplay
           mode="static"
