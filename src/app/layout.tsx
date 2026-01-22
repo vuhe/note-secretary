@@ -1,6 +1,7 @@
+// noinspection HtmlRequiredTitleElement,JSUnresolvedLibraryURL
+
 "use client";
 
-import { ReactScan } from "@/app/react-scan";
 import "@/styles/globals.css";
 import "katex/dist/katex.min.css"; // for Markdown math support. required.
 
@@ -40,6 +41,8 @@ export default function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const isDev = process.env.NODE_ENV === "development" && process.env.NEXT_PUBLIC_DEBUG === "debug";
+
   useEffect(() => {
     void usePlatform.getState().init();
     void usePersona.getState().update();
@@ -49,7 +52,11 @@ export default function RootLayout({
 
   return (
     <html lang="zh" suppressHydrationWarning>
-      <ReactScan />
+      <head>
+        {isDev && (
+          <script crossOrigin="anonymous" src="https://unpkg.com/react-scan/dist/auto.global.js" />
+        )}
+      </head>
       <body className={`${jetbrainsMono.variable} antialiased overflow-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SidebarProvider
