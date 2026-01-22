@@ -26,8 +26,8 @@ interface MessageProps {
 }
 
 interface AgentMessageProps extends MessageProps {
-  status: ChatStatus;
-  last: boolean;
+  showActions: boolean;
+  isStreaming: boolean;
 }
 
 function filename(file: FileUIPart) {
@@ -37,9 +37,8 @@ function filename(file: FileUIPart) {
   return "保存生成文件";
 }
 
-function AgentMessage({ message, status, last }: AgentMessageProps) {
+function AgentMessage({ message, showActions, isStreaming }: AgentMessageProps) {
   const isDesktop = usePlatform((state) => state.isDesktop);
-  const showActions = !last || status === "error" || status === "ready";
   const sources = message.parts.filter(
     (part) => part.type === "source-url" || part.type === "source-document",
   );
@@ -107,7 +106,7 @@ function AgentMessage({ message, status, last }: AgentMessageProps) {
               <Reasoning
                 key={`${message.id}-${i}`}
                 className="w-full"
-                isStreaming={status === "streaming" && i === message.parts.length - 1 && last}
+                isStreaming={isStreaming && i === message.parts.length - 1}
               >
                 <ReasoningTrigger />
                 <ReasoningContent>{part.text}</ReasoningContent>
@@ -174,7 +173,7 @@ function UserMessage({ message }: MessageProps) {
   );
 }
 
-export function ChatMessage(props: AgentMessageProps) {
+function ChatMessage(props: AgentMessageProps) {
   if (props.message.role === "user") {
     return <UserMessage message={props.message} />;
   }
@@ -182,4 +181,36 @@ export function ChatMessage(props: AgentMessageProps) {
     return <AgentMessage {...props} />;
   }
   return null;
+}
+
+interface ChatMessagesProps {
+  messages: DisplayMessage[];
+  status: ChatStatus;
+}
+
+export function ChatMessages({ messages, status }: ChatMessagesProps) {
+  const showActions = (index: number) => {
+    const last = index === messages.length - 1;
+    return !last || status === "error" || status === "ready";
+  };
+
+  const isStreaming = (index: number) => {
+    const last = index === messages.length - 1;
+    return last && status === "streaming";
+  };
+
+  if (messages.length === 0) return null;
+
+  return (
+    <>
+      {messages.map((message, i) => (
+        <ChatMessage
+          key={message.id}
+          message={message}
+          showActions={showActions(i)}
+          isStreaming={isStreaming(i)}
+        />
+      ))}
+    </>
+  );
 }
