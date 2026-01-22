@@ -1,11 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AnimatePresence } from "motion/react";
 import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { AnimateDiv } from "@/components/animation/animate-div";
+import { DeleteConfirm } from "@/components/animation/delete-confirm";
 import {
   NoteCategoryField,
   NoteSummaryField,
@@ -34,7 +33,6 @@ interface NoteMetadataProps {
 
 function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
   const [open, setOpen] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState(2);
   const router = useSafeRoute();
   const { control, handleSubmit, reset } = useForm<Note>({
     resolver: zodResolver(NoteSchema),
@@ -51,22 +49,15 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
     setOpen(open);
     if (open) return;
     reset();
-    setDeleteConfirm(2);
   };
 
   const onSubmit = (data: Note) => {
     setOpen(false);
     submitMetadata(data);
-    setDeleteConfirm(2);
   };
 
   const onDelete = () => {
-    if (deleteConfirm > 0) {
-      setDeleteConfirm(deleteConfirm - 1);
-      return;
-    }
     setOpen(false);
-    setDeleteConfirm(2);
     invokeDeleteNote(note.id, () => {
       router.goToNewChat();
     });
@@ -95,39 +86,14 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
             </FieldGroup>
           </FieldSet>
           <DialogFooter className="select-none">
-            <AnimatePresence mode="wait">
-              {deleteConfirm === 2 ? (
-                <AnimateDiv
-                  key="delete-2"
-                  className="w-full flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"
-                >
-                  <Button variant="destructive" className="mr-auto" onClick={onDelete}>
-                    删除
-                  </Button>
-                  <DialogClose asChild>
-                    <Button variant="outline">取消</Button>
-                  </DialogClose>
-                  <Button type="submit" form={formId}>
-                    保存
-                  </Button>
-                </AnimateDiv>
-              ) : deleteConfirm === 1 ? (
-                <AnimateDiv key="delete-1" className="m-auto">
-                  <span className="mr-2">二次确认</span>
-                  <Button variant="destructive" onClick={onDelete}>
-                    删除
-                  </Button>
-                  <span className="ml-2">后不可恢复</span>
-                </AnimateDiv>
-              ) : (
-                <AnimateDiv key="delete-0" className="gap-1">
-                  <span className="mr-2">最终确认，执行</span>
-                  <Button variant="destructive" onClick={onDelete}>
-                    删除
-                  </Button>
-                </AnimateDiv>
-              )}
-            </AnimatePresence>
+            <DeleteConfirm resetOnChange={open} onDelete={onDelete}>
+              <DialogClose asChild>
+                <Button variant="outline">取消</Button>
+              </DialogClose>
+              <Button type="submit" form={formId}>
+                保存
+              </Button>
+            </DeleteConfirm>
           </DialogFooter>
         </DialogContent>
       </form>
