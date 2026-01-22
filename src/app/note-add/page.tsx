@@ -1,18 +1,9 @@
 "use client";
 
 import { useId } from "react";
-import { Controller } from "react-hook-form";
-
+import { NoteCategoryField, NoteTitleField } from "@/components/form-fields/note-fields";
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-  FieldSet,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { Field, FieldGroup, FieldSeparator, FieldSet } from "@/components/ui/field";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { useAddNode } from "@/hooks/use-note";
 import { cn } from "@/lib/utils";
@@ -21,8 +12,6 @@ import { cn } from "@/lib/utils";
 export default function Page() {
   const { control, reset, onSubmit } = useAddNode();
   const formId = useId();
-  const categoryId = useId();
-  const titleId = useId();
 
   return (
     <SidebarInset key="note-add">
@@ -42,40 +31,8 @@ export default function Page() {
         <form id={formId} className="min-w-70" onSubmit={onSubmit}>
           <FieldSet>
             <FieldGroup>
-              <Controller
-                name="category"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={categoryId}>分类</FieldLabel>
-                    <Input
-                      {...field}
-                      id={categoryId}
-                      aria-invalid={fieldState.invalid}
-                      placeholder="请输入笔记分类……"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="title"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={titleId}>标题</FieldLabel>
-                    <Input
-                      {...field}
-                      id={titleId}
-                      aria-invalid={fieldState.invalid}
-                      placeholder="请输入笔记标题……"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+              <NoteCategoryField control={control} />
+              <NoteTitleField control={control} />
             </FieldGroup>
             <FieldSeparator />
             <Field orientation="horizontal">

@@ -3,9 +3,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence } from "motion/react";
 import { useId, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import { AnimateDiv } from "@/components/animation/animate-div";
+import {
+  NoteCategoryField,
+  NoteSummaryField,
+  NoteTitleField,
+} from "@/components/form-fields/note-fields";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,16 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldSet,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { FieldGroup, FieldSet } from "@/components/ui/field";
 import { usePlatform } from "@/hooks/use-mobile";
 import { invokeDeleteNote, type Note, NoteSchema, type NoteStatus } from "@/hooks/use-note";
 import { useSafeRoute } from "@/hooks/use-router";
@@ -77,9 +73,6 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
   };
 
   const formId = useId();
-  const categoryId = useId();
-  const titleId = useId();
-  const summaryId = useId();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -96,60 +89,9 @@ function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
           </DialogHeader>
           <FieldSet>
             <FieldGroup>
-              <Controller
-                name="category"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={categoryId}>分类</FieldLabel>
-                    <Input
-                      {...field}
-                      id={categoryId}
-                      aria-invalid={fieldState.invalid}
-                      placeholder="请输入笔记分类……"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="title"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={titleId}>标题</FieldLabel>
-                    <Input
-                      {...field}
-                      id={titleId}
-                      aria-invalid={fieldState.invalid}
-                      placeholder="请输入笔记标题……"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="summary"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={summaryId}>摘要</FieldLabel>
-                    <FieldDescription>
-                      用于提供给&nbsp;AI&nbsp;搜索、处理的摘要信息，作为附件发送给&nbsp;AI&nbsp;时仅提供此信息不会提供正文
-                    </FieldDescription>
-                    <Textarea
-                      {...field}
-                      id={summaryId}
-                      aria-invalid={fieldState.invalid}
-                      placeholder="请输入笔记摘要……"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+              <NoteCategoryField control={control} />
+              <NoteTitleField control={control} />
+              <NoteSummaryField control={control} />
             </FieldGroup>
           </FieldSet>
           <DialogFooter className="select-none">
