@@ -1,9 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useId } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useId } from "react";
+import { Controller } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,38 +14,12 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { invokeAddNote, type Note, NoteSchema } from "@/hooks/use-note";
-import { useSafeRoute } from "@/hooks/use-router";
+import { useAddNode } from "@/hooks/use-note";
 import { cn } from "@/lib/utils";
 
 // biome-ignore lint/style/noDefaultExport: Next.js Page
 export default function Page() {
-  const searchParams = useSearchParams();
-  const router = useSafeRoute();
-  const id = searchParams.get("id") ?? "";
-
-  const { control, handleSubmit, reset } = useForm<Note>({
-    resolver: zodResolver(NoteSchema),
-    defaultValues: {
-      id: id,
-      category: "",
-      title: "",
-      summary: "",
-      content: "",
-    },
-  });
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: 清理上次未提交的内容
-  useEffect(() => {
-    reset();
-  }, [id, reset]);
-
-  const addNote = (note: Note) => {
-    invokeAddNote({ ...note, id }, () => {
-      router.goToNote(id);
-    });
-  };
-
+  const { control, reset, onSubmit } = useAddNode();
   const formId = useId();
   const categoryId = useId();
   const titleId = useId();
@@ -67,7 +39,7 @@ export default function Page() {
         </div>
       </header>
       <div className="@container/main flex flex-1 items-center justify-center min-h-0 mb-(--header-height)">
-        <form id={formId} className="min-w-70" onSubmit={handleSubmit(addNote)}>
+        <form id={formId} className="min-w-70" onSubmit={onSubmit}>
           <FieldSet>
             <FieldGroup>
               <Controller

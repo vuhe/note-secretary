@@ -1,8 +1,11 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { invoke } from "@tauri-apps/api/core";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useSafeRoute } from "@/hooks/use-router";
 import { safeError, safeErrorString } from "@/lib/utils";
 
 export const NoteSchema = z.object({
@@ -107,20 +110,46 @@ export function useNote() {
   };
 }
 
-export function invokeAddNote(note: Note, success: () => void) {
-  invoke("add_note", { note })
-    .then(() => {
-      success();
-      toast.success("添加笔记成功", {
-        closeButton: true,
+export function useAddNode() {
+  const searchParams = useSearchParams();
+  const router = useSafeRoute();
+  const id = searchParams.get("id") ?? "";
+
+  const { control, handleSubmit, reset } = useForm<Note>({
+    resolver: zodResolver(NoteSchema),
+    defaultValues: {
+      id: id,
+      category: "",
+      title: "",
+      summary: "",
+      content: "",
+    },
+  });
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 清理上次未提交的内容
+  useEffect(() => {
+    reset();
+  }, [id, reset]);
+
+  const addNote = (note: Note) => {
+    invoke("add_note", { note })
+      .then(() => {
+        router.goToNote(id);
+        toast.success("添加笔记成功", {
+          closeButton: true,
+        });
+      })
+      .catch((error: unknown) => {
+        toast.error("添加笔记失败", {
+          description: safeErrorString(error),
+          closeButton: true,
+        });
       });
-    })
-    .catch((error: unknown) => {
-      toast.error("添加笔记失败", {
-        description: safeErrorString(error),
-        closeButton: true,
-      });
-    });
+  };
+
+  const onSubmit = handleSubmit(addNote);
+
+  return { control, reset, onSubmit };
 }
 
 export function invokeDeleteNote(id: string, success: () => void) {
