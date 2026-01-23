@@ -1,14 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { invoke } from "@tauri-apps/api/core";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { useSafeRoute } from "@/hooks/use-router";
 import { safeErrorString } from "@/lib/utils";
 
-export const NoteSchema = z.object({
+const NoteSchema = z.object({
   id: z.string().trim().min(1, "ID 不能为空"),
   category: z.string().trim().min(1, "分类不能为空"),
   title: z.string().trim().min(1, "标题不能为空"),

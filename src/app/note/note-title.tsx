@@ -148,7 +148,11 @@ export function NoteTitle({
     if (isDesktop) {
       return (
         <>
-          <NoteMetadata title={title} control={control} onDelete={onDelete} {...props} />
+          {displayMode !== "display" ? (
+            <div className="text-base font-medium select-none">{title}</div>
+          ) : (
+            <NoteMetadata title={title} control={control} onDelete={onDelete} {...props} />
+          )}
           <NoteToolbar displayMode={displayMode} onEditing={onEditing} {...props} />
         </>
       );
