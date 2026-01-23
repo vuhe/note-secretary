@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { useSafeRoute } from "@/hooks/use-router";
-import { safeError, safeErrorString } from "@/lib/utils";
+import { safeErrorString } from "@/lib/utils";
 
 export const NoteSchema = z.object({
   id: z.string().trim().min(1, "ID 不能为空"),
@@ -18,54 +18,81 @@ export const NoteSchema = z.object({
 
 export type Note = z.infer<typeof NoteSchema>;
 
-export type NoteStatus =
-  | {
-      status: "loading";
-    }
-  | {
-      status: "success";
-      value: Note;
-    }
-  | {
-      status: "error";
-      value: Error;
-    };
+export interface NoteStatus {
+  status: "loading" | "success" | "error";
+  error?: string;
+}
 
-export type NoteEditStatus = "display" | "editing" | "submitting";
+export type NoteDisplayMode = "display" | "editing" | "submitting";
 
 export function useNote() {
+  const router = useSafeRoute();
   const searchParams = useSearchParams();
   const [prevId, setPrevId] = useState<string | null>(null);
 
   const [status, setStatus] = useState<NoteStatus>({ status: "loading" });
-  const [editing, setEditing] = useState<NoteEditStatus>("display");
-  const [draft, setDraft] = useState<string>("");
+  const [displayMode, setDisplayMode] = useState<NoteDisplayMode>("display");
+
+  const { control, handleSubmit, reset, formState } = useForm<Note>({
+    resolver: zodResolver(NoteSchema),
+  });
+
+  const title = `${formState.defaultValues?.category} - ${formState.defaultValues?.title}`;
+  const content = formState.defaultValues?.content ?? "";
 
   const currentId = searchParams.get("id") ?? "";
   if (currentId !== prevId) {
     setPrevId(currentId);
-    setEditing("display");
-    setDraft("");
+    setDisplayMode("display");
     setStatus({ status: "loading" });
   }
 
   useEffect(() => {
     invoke<Note>("get_note_by_id", { id: searchParams.get("id") ?? "" })
       .then((note) => {
-        setStatus({ status: "success", value: note });
+        setStatus({ status: "success" });
+        reset(note);
       })
       .catch((error: unknown) => {
-        setStatus({ status: "error", value: safeError(error) });
+        setStatus({ status: "error", error: safeErrorString(error) });
       });
-  }, [searchParams]);
+  }, [searchParams, reset]);
 
-  const submitMetadata = useCallback(
-    (data: Note) => {
-      if (status.status !== "success") return;
-      invoke("modify_note_meta", { note: data })
+  const onEditing = () => {
+    setDisplayMode("editing");
+  };
+
+  const onCancel = () => {
+    setDisplayMode("display");
+    reset();
+  };
+
+  const onSubmit = handleSubmit((data) => {
+    if (!formState.isDirty) {
+      setDisplayMode("display");
+      return;
+    }
+    if (formState.dirtyFields.content) {
+      setDisplayMode("submitting");
+      invoke("modify_note_content", { id: data.id, content: data.content })
         .then(() => {
-          const newNote = { ...data, content: status.value.content };
-          setStatus({ status: "success", value: newNote });
+          setDisplayMode("display");
+          reset(data);
+          setStatus({ status: "success" });
+        })
+        .catch((error: unknown) => {
+          setDisplayMode("editing");
+          toast.error("保存笔记失败", {
+            description: safeErrorString(error),
+            closeButton: true,
+          });
+        });
+    } else {
+      const note = { ...data, content: "" };
+      invoke("modify_note_meta", { note })
+        .then(() => {
+          setStatus({ status: "success" });
+          reset(data);
           toast.success("保存笔记元数据成功", {
             closeButton: true,
           });
@@ -76,37 +103,35 @@ export function useNote() {
             closeButton: true,
           });
         });
-    },
-    [status],
-  );
+    }
+  });
 
-  const submitDraft = useCallback(() => {
-    if (status.status !== "success") return;
-    setEditing("submitting");
-    invoke("modify_note_content", { id: status.value.id, content: draft })
+  const onDelete = () => {
+    invoke("delete_note_by_id", { id: currentId })
       .then(() => {
-        setEditing("display");
-        const newNote = { ...status.value, content: draft };
-        setStatus({ status: "success", value: newNote });
-        setDraft("");
+        router.goToNewChat();
+        toast.success("删除笔记成功", {
+          closeButton: true,
+        });
       })
       .catch((error: unknown) => {
-        setEditing("editing");
-        toast.error("保存笔记失败", {
+        toast.error("删除笔记失败", {
           description: safeErrorString(error),
           closeButton: true,
         });
       });
-  }, [draft, status]);
+  };
 
   return {
     status,
-    editing,
-    setEditing,
-    draft,
-    setDraft,
-    submitMetadata,
-    submitDraft,
+    displayMode,
+    title,
+    content,
+    control,
+    onEditing,
+    onCancel,
+    onSubmit,
+    onDelete,
   };
 }
 
@@ -150,20 +175,4 @@ export function useAddNode() {
   const onSubmit = handleSubmit(addNote);
 
   return { control, reset, onSubmit };
-}
-
-export function invokeDeleteNote(id: string, success: () => void) {
-  invoke("delete_note_by_id", { id })
-    .then(() => {
-      success();
-      toast.success("删除笔记成功", {
-        closeButton: true,
-      });
-    })
-    .catch((error: unknown) => {
-      toast.error("删除笔记失败", {
-        description: safeErrorString(error),
-        closeButton: true,
-      });
-    });
 }

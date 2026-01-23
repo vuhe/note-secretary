@@ -2,26 +2,32 @@
 
 import { CircleSlash2Icon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
+import { type Control, Controller } from "react-hook-form";
 
 import { AnimateDiv } from "@/components/animation/animate-div";
 import { MarkdownDisplay } from "@/components/markdown/display";
 import { MarkdownSplitView } from "@/components/markdown/split";
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import type { NoteEditStatus } from "@/hooks/use-note";
+import type { Note, NoteDisplayMode } from "@/hooks/use-note";
 
 interface NoteContentProps {
+  displayMode: NoteDisplayMode;
   content: string;
-  editing: NoteEditStatus;
-  draft: string;
-  setDraft: (s: string) => void;
+  control: Control<Note>;
 }
 
-export function NoteContent({ content, editing, draft, setDraft }: NoteContentProps) {
+export function NoteContent({ displayMode, content, control }: NoteContentProps) {
   return (
     <AnimatePresence mode="wait">
-      {editing !== "display" ? (
+      {displayMode !== "display" ? (
         <AnimateDiv className="flex size-full" key="editor">
-          <MarkdownSplitView content={content} draft={draft} setDraft={setDraft} />
+          <Controller
+            name="content"
+            control={control}
+            render={({ field }) => (
+              <MarkdownSplitView content={content} draft={field.value} setDraft={field.onChange} />
+            )}
+          />
         </AnimateDiv>
       ) : (
         <AnimateDiv className="size-full overflow-y-auto relative" key="display">

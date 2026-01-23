@@ -1,10 +1,9 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
-import { useId, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
+import type { Control } from "react-hook-form";
 
 import { AnimateDiv } from "@/components/animation/animate-div";
 import { DeleteConfirm } from "@/components/animation/delete-confirm";
@@ -26,130 +25,89 @@ import {
 } from "@/components/ui/dialog";
 import { FieldGroup, FieldSet } from "@/components/ui/field";
 import { usePlatform } from "@/hooks/use-mobile";
-import {
-  invokeDeleteNote,
-  type Note,
-  type NoteEditStatus,
-  NoteSchema,
-  type NoteStatus,
-} from "@/hooks/use-note";
-import { useSafeRoute } from "@/hooks/use-router";
+import type { Note, NoteDisplayMode, NoteStatus } from "@/hooks/use-note";
 
 interface NoteMetadataProps {
-  note: Note;
-  submitMetadata: (data: Note) => void;
+  title: string;
+  control: Control<Note>;
+  onCancel: () => void;
+  onSubmit: () => Promise<void>;
+  onDelete: () => void;
 }
 
-function NoteMetadata({ note, submitMetadata }: NoteMetadataProps) {
+function NoteMetadata({ title, control, onCancel, onSubmit, onDelete }: NoteMetadataProps) {
   const [open, setOpen] = useState(false);
-  const router = useSafeRoute();
-  const { control, handleSubmit, reset } = useForm<Note>({
-    resolver: zodResolver(NoteSchema),
-    defaultValues: {
-      id: note.id,
-      category: note.category,
-      title: note.title,
-      summary: note.summary,
-      content: "",
-    },
-  });
 
   const onOpenChange = (open: boolean) => {
     setOpen(open);
     if (open) return;
-    reset();
+    onCancel();
   };
 
-  const onSubmit = (data: Note) => {
+  const handleSubmit = () => {
     setOpen(false);
-    submitMetadata(data);
+    void onSubmit();
   };
 
-  const onDelete = () => {
+  const handleDelete = () => {
     setOpen(false);
-    invokeDeleteNote(note.id, () => {
-      router.goToNewChat();
-    });
+    onDelete();
   };
-
-  const formId = useId();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <form id={formId} onSubmit={handleSubmit(onSubmit)}>
-        <DialogTrigger asChild>
-          <Button size="sm" variant="ghost" className="-ml-3">
-            <span className="text-base font-medium">{`${note.category} - ${note.title}`}</span>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-110 max-h-full">
-          <DialogHeader>
-            <DialogTitle>笔记信息</DialogTitle>
-            <DialogDescription>在此编辑笔记相关内容或者删除笔记</DialogDescription>
-          </DialogHeader>
-          <FieldSet>
-            <FieldGroup>
-              <NoteCategoryField control={control} />
-              <NoteTitleField control={control} />
-              <NoteSummaryField control={control} />
-            </FieldGroup>
-          </FieldSet>
-          <DialogFooter className="select-none">
-            <DeleteConfirm resetOnChange={open} onDelete={onDelete}>
-              <DialogClose asChild>
-                <Button variant="outline">取消</Button>
-              </DialogClose>
-              <Button type="submit" form={formId}>
-                保存
-              </Button>
-            </DeleteConfirm>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="ghost" className="-ml-3">
+          <span className="text-base font-medium">{title}</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-110 max-h-full">
+        <DialogHeader>
+          <DialogTitle>笔记信息</DialogTitle>
+          <DialogDescription>在此编辑笔记相关内容或者删除笔记</DialogDescription>
+        </DialogHeader>
+        <FieldSet>
+          <FieldGroup>
+            <NoteCategoryField control={control} />
+            <NoteTitleField control={control} />
+            <NoteSummaryField control={control} />
+          </FieldGroup>
+        </FieldSet>
+        <DialogFooter className="select-none">
+          <DeleteConfirm resetOnChange={open} onDelete={handleDelete}>
+            <DialogClose asChild>
+              <Button variant="outline">取消</Button>
+            </DialogClose>
+            <Button onClick={handleSubmit}>保存</Button>
+          </DeleteConfirm>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 }
 
 interface NoteToolbarProps {
-  status: NoteStatus;
-  editing: NoteEditStatus;
-  setEditing: (value: NoteEditStatus) => void;
-  setDraft: (value: string) => void;
-  submitDraft: () => void;
+  displayMode: NoteDisplayMode;
+  onEditing: () => void;
+  onCancel: () => void;
+  onSubmit: () => Promise<void>;
 }
 
-export function NoteToolbar({
-  status,
-  editing,
-  setEditing,
-  setDraft,
-  submitDraft,
-}: NoteToolbarProps) {
-  const modify = () => {
-    if (status.status !== "success") return;
-    setDraft(status.value.content);
-    setEditing("editing");
-  };
-
-  const cancel = () => {
-    setDraft("");
-    setEditing("display");
-  };
-
+export function NoteToolbar({ displayMode, onEditing, onCancel, onSubmit }: NoteToolbarProps) {
   return (
     <AnimatePresence mode="wait">
-      {editing === "editing" ? (
+      {displayMode === "editing" ? (
         <AnimateDiv key="note-editing" className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={cancel}>
+          <Button variant="ghost" size="sm" onClick={onCancel}>
             返回
           </Button>
-          <Button size="sm" onClick={submitDraft}>
+          <Button size="sm" onClick={onSubmit}>
             提交
           </Button>
         </AnimateDiv>
-      ) : editing === "display" ? (
+      ) : displayMode === "display" ? (
         <AnimateDiv key="note-display" className="ml-auto flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={modify}>
+          <Button variant="secondary" size="sm" onClick={onEditing}>
             编辑
           </Button>
         </AnimateDiv>
@@ -167,25 +125,34 @@ export function NoteToolbar({
 
 interface NoteTitleProps {
   status: NoteStatus;
-  submitMetadata: (data: Note) => void;
-  editing: NoteEditStatus;
-  setEditing: (value: NoteEditStatus) => void;
-  setDraft: (value: string) => void;
-  submitDraft: () => void;
+  displayMode: NoteDisplayMode;
+  title: string;
+  control: Control<Note>;
+  onEditing: () => void;
+  onCancel: () => void;
+  onSubmit: () => Promise<void>;
+  onDelete: () => void;
 }
 
-export function NoteTitle({ status, submitMetadata, ...props }: NoteTitleProps) {
+export function NoteTitle({
+  status,
+  displayMode,
+  title,
+  control,
+  onEditing,
+  onDelete,
+  ...props
+}: NoteTitleProps) {
   const isDesktop = usePlatform((state) => state.isDesktop);
   if (status.status === "success") {
     if (isDesktop) {
       return (
         <>
-          <NoteMetadata note={status.value} submitMetadata={submitMetadata} />
-          <NoteToolbar status={status} {...props} />
+          <NoteMetadata title={title} control={control} onDelete={onDelete} {...props} />
+          <NoteToolbar displayMode={displayMode} onEditing={onEditing} {...props} />
         </>
       );
     }
-    const title = `${status.value.category} - ${status.value.title}`;
     return <div className="text-base font-medium select-none">{title}</div>;
   }
   return <div className="text-base text-muted-foreground font-medium select-none">加载中……</div>;
