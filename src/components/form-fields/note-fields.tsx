@@ -1,3 +1,5 @@
+"use client";
+
 import { useId } from "react";
 import { type Control, Controller } from "react-hook-form";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";

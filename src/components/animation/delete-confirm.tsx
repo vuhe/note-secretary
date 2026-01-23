@@ -1,3 +1,5 @@
+"use client";
+
 import { AnimatePresence } from "motion/react";
 import { type ReactNode, useEffect, useState } from "react";
 import { AnimateDiv } from "@/components/animation/animate-div";
