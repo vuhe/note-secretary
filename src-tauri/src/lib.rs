@@ -76,6 +76,7 @@ pub fn run() {
       let win_builder = tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::default())
         .title("Note Secretary")
         .inner_size(900.0, 700.0)
+        .min_inner_size(768.0, 350.0)
         .resizable(true)
         .fullscreen(false);
 
