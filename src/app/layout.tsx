@@ -3,7 +3,6 @@
 "use client";
 
 import "@/styles/globals.css";
-import "katex/dist/katex.min.css"; // for Markdown math support. required.
 
 import { AnimatePresence } from "motion/react";
 import localFont from "next/font/local";
