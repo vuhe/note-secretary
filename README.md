@@ -1,12 +1,18 @@
-# Note Secretary
+# [Prototype] AI Secretary (Early stage testing only)
 
-[Tauri 2.0 + Next.js 16 App Router Template](https://github.com/kvnxiao/tauri-nextjs-template)
+> [!IMPORTANT]
+> 
+> This project is a half-finished prototype used for early testing.
+> The core logic has been moved to other projects.
+> It is provided "as-is" under the **MIT License**.
+
+Project use [Tauri 2.0 + Next.js 16 App Router Template](https://github.com/kvnxiao/tauri-nextjs-template)
 
 This is a [Tauri](https://v2.tauri.app/) project template using [Next.js](https://nextjs.org/),
 bootstrapped by combining [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app)
 and [`create tauri-app`](https://v2.tauri.app/start/create-project/).
 
-This template uses [`pnpm`](https://pnpm.io/) as the Node.js dependency
+This template uses [`bun`](https://bun.sh/) as the Node.js dependency
 manager, and uses the [App Router](https://nextjs.org/docs/app) model for Next.js.
 
 ## Template Features
@@ -18,7 +24,7 @@ manager, and uses the [App Router](https://nextjs.org/docs/app) model for Next.j
     [React Aria components](https://react-spectrum.adobe.com/react-aria/index.html)
     and/or [HeadlessUI components](https://headlessui.com/) for completely unstyled and
     fully accessible UI components, which integrate nicely with TailwindCSS
-- Opinionated formatting and linting already setup and enabled
+- Opinionated formatting and linting are already setup and enabled
   - [Biome](https://biomejs.dev/) for a combination of fast formatting, linting, and
     import sorting of TypeScript code
   - [clippy](https://github.com/rust-lang/rust-clippy) and
@@ -32,12 +38,12 @@ manager, and uses the [App Router](https://nextjs.org/docs/app) model for Next.j
 To develop and run the frontend in a Tauri window:
 
 ```shell
-pnpm tauri dev
+bun tauri dev
 ```
 
 This will load the Next.js frontend directly in a Tauri webview window, in addition to
 starting a development server on `localhost:3000`.
-Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> in a Chromium based WebView (e.g. on
+Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> in a Chromium-based WebView (e.g. on
 Windows) to open the web developer console from the Tauri window.
 
 ### Building for release
@@ -45,7 +51,7 @@ Windows) to open the web developer console from the Tauri window.
 To export the Next.js frontend via SSG and build the Tauri application for release:
 
 ```shell
-pnpm tauri build
+bun tauri build
 ```
 
 ### Source structure
